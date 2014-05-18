@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WidgetTool</class>
+ <widget class="QWidget" name="WidgetTool">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="2" column="0">
+      <widget class="QLabel" name="dimXLabel">
+       <property name="text">
+        <string>dim x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="dimXDoubleSpinBox">
+       <property name="suffix">
+        <string> Angstom</string>
+       </property>
+       <property name="maximum">
+        <double>1000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>100.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="dimYLabel">
+       <property name="text">
+        <string>dim y</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QDoubleSpinBox" name="dimYDoubleSpinBox">
+       <property name="suffix">
+        <string> Angstom</string>
+       </property>
+       <property name="maximum">
+        <double>1000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>100.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="dimZLabel">
+       <property name="text">
+        <string>dim z</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QDoubleSpinBox" name="dimZDoubleSpinBox">
+       <property name="suffix">
+        <string> Angstom</string>
+       </property>
+       <property name="maximum">
+        <double>1000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>100.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="nLabel">
+       <property name="text">
+        <string>n</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="nSpinBox">
+       <property name="maximum">
+        <number>10000000</number>
+       </property>
+       <property name="value">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="speedLabel">
+       <property name="text">
+        <string>speed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="speedDoubleSpinBox">
+       <property name="maximum">
+        <double>1000000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>100.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>set</string>
+     </property>
+     <property name="autoDefault">
+      <bool>true</bool>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>nSpinBox</tabstop>
+  <tabstop>speedDoubleSpinBox</tabstop>
+  <tabstop>dimXDoubleSpinBox</tabstop>
+  <tabstop>dimYDoubleSpinBox</tabstop>
+  <tabstop>dimZDoubleSpinBox</tabstop>
+  <tabstop>pushButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>nSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>318</x>
+     <y>28</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>357</x>
+     <y>279</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>speedDoubleSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>320</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>322</x>
+     <y>273</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dimXDoubleSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>280</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>285</x>
+     <y>282</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dimYDoubleSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>240</x>
+     <y>128</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>247</x>
+     <y>286</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dimZDoubleSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>201</x>
+     <y>169</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>195</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
