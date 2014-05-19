@@ -15,12 +15,14 @@ public:
 	int evolve(double dt);
 
 	QVector<Particle> _ps;
+	double _contract;
 
 private:
 	void computeMaxR();
 
 	double _dim[3];
-	double _maxr;
+	double _maxd;
+
 };
 
 #endif // SYSTEM_HH

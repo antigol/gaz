@@ -23,9 +23,10 @@ void GLWidget::initializeGL()
 							   "varying vec3 _normal, _eye;"
 							   "void main(void)"
 							   "{"
-							   "	gl_Position = proj * view * model * vec4(vertex, 1.0);"
+							   "	vec4 v = view * model * vec4(vertex, 1.0);"
+							   "	gl_Position = proj * v;"
 							   "	_normal = nview * nmodel * vertex;"
-							   "	_eye = vec3(view * model * vec4(vertex, 1.0));"
+							   "	_eye = v.xyz;"
 							   "}"
 							   );
 	_p.addShaderFromSourceCode(QGLShader::Fragment,
@@ -50,8 +51,8 @@ void GLWidget::initializeGL()
 	_p.setUniformValue("light", QVector3D(1.0, 1.0, 1.0).normalized());
 
 	_sphere.initializeGL(20, 20);
+	_v.translate(0.0, 0.0, -10.0);
 
-	_trans.translate(0, 0, -200.0);
 	glEnable(GL_DEPTH_TEST);
 
 	startTimer(0);
@@ -71,8 +72,8 @@ void GLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_p.setUniformValue("view", _trans * _v);
-	_p.setUniformValue("nview", (_trans * _v).normalMatrix());
+	_p.setUniformValue("view", _v);
+	_p.setUniformValue("nview", _v.normalMatrix());
 
 	QMatrix4x4 m;
 	_sphere.bind();
@@ -114,7 +115,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *e)
 {
 	QPointF d = e->pos() - mouseLastPos;
 	QMatrix4x4 m;
-	m.rotate(d.manhattanLength(), d.y(), d.x(), 0.0);
+	m.rotate(d.manhattanLength() * 0.5, d.y(), d.x(), 0.0);
 	_v = m * _v;
 	mouseLastPos = e->pos();
 }
@@ -122,5 +123,33 @@ void GLWidget::mouseMoveEvent(QMouseEvent *e)
 #include <QWheelEvent>
 void GLWidget::wheelEvent(QWheelEvent *e)
 {
-	_trans.translate(0, 0, e->delta() * 0.1);
+	QMatrix4x4 m;
+	m.translate(0, 0, e->delta() * 0.1);
+	_v = m * _v;
+}
+
+#include <QKeyEvent>
+void GLWidget::keyPressEvent(QKeyEvent *e)
+{
+	qDebug() << "key";
+	QGLWidget::keyPressEvent(e);
+
+	QMatrix4x4 m;
+
+	switch (e->key()) {
+	case Qt::Key_W:
+		m.translate(0.0, -1.0, 0.0);
+		break;
+	case Qt::Key_S:
+		m.translate(0.0, 1.0, 0.0);
+		break;
+	case Qt::Key_A:
+		m.translate(1.0, 0.0, 0.0);
+		break;
+	case Qt::Key_D:
+		m.translate(-1.0, 0.0, 0.0);
+		break;
+	}
+
+	_v = m * _v;
 }

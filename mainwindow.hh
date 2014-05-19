@@ -21,8 +21,6 @@ private slots:
 private:
 	GLWidget* _gl;
 	Ui::WidgetTool *ui;
-
-
 };
 
 #endif // MAINWINDOW_HH

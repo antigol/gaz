@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->dimXDoubleSpinBox->setValue(s.value("dimX", ui->dimXDoubleSpinBox->value()).toDouble());
 	ui->dimYDoubleSpinBox->setValue(s.value("dimY", ui->dimYDoubleSpinBox->value()).toDouble());
 	ui->dimZDoubleSpinBox->setValue(s.value("dimZ", ui->dimZDoubleSpinBox->value()).toDouble());
+	ui->contractSpeedDoubleSpinBox->setValue(s.value("contract", ui->contractSpeedDoubleSpinBox->value()).toDouble());
 }
 
 MainWindow::~MainWindow()
@@ -38,6 +39,7 @@ MainWindow::~MainWindow()
 	s.setValue("dimX", ui->dimXDoubleSpinBox->value());
 	s.setValue("dimY", ui->dimYDoubleSpinBox->value());
 	s.setValue("dimZ", ui->dimZDoubleSpinBox->value());
+	s.setValue("contract", ui->contractSpeedDoubleSpinBox->value());
 	delete ui;
 }
 
@@ -45,6 +47,7 @@ void MainWindow::onSetClicked()
 {
 	_gl->_sys.setSizes(ui->dimXDoubleSpinBox->value(), ui->dimYDoubleSpinBox->value(), ui->dimZDoubleSpinBox->value());
 	_gl->_sys.initRandomParticles(ui->nSpinBox->value(), ui->speedDoubleSpinBox->value());
+	_gl->_sys._contract = ui->contractSpeedDoubleSpinBox->value();
 //	Particle p;
 //	p.r = 10.0;
 //	p.m = 100.0 * p.m;

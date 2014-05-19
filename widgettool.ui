@@ -110,18 +110,29 @@
        </property>
       </widget>
      </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="contractSpeedLabel">
+       <property name="text">
+        <string>contractSpeed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QDoubleSpinBox" name="contractSpeedDoubleSpinBox">
+       <property name="minimum">
+        <double>-100000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
     <widget class="QPushButton" name="pushButton">
      <property name="text">
       <string>set</string>
-     </property>
-     <property name="autoDefault">
-      <bool>true</bool>
-     </property>
-     <property name="default">
-      <bool>true</bool>
      </property>
     </widget>
    </item>
