@@ -114,6 +114,7 @@ void GLWidget::timerEvent(QTimerEvent *)
 	while (q.size() > N)
 		sum -= q.dequeue();
 	qDebug() << "check collision = " << sum/N << "ms";
+	qDebug() << "total = " << _t.elapsed() << "ms";
 }
 
 #include <QMouseEvent>
@@ -127,9 +128,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *e)
 	QPointF d = e->pos() - mouseLastPos;
 	QMatrix4x4 m;
 	if (e->buttons() & Qt::LeftButton)
-		m.rotate(d.manhattanLength() * 0.5, d.y(), d.x(), 0.0);
+		m.rotate(0.3*d.manhattanLength(), d.y(), d.x(), 0.0);
 	if (e->buttons() & Qt::RightButton)
-		m.translate(-d.x(), d.y(), 0.0);
+		m.translate(0.5*d.x(), -0.5*d.y(), 0.0);
 	_v = m * _v;
 	mouseLastPos = e->pos();
 }

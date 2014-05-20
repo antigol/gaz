@@ -3,6 +3,7 @@
 
 #include "particle.hh"
 #include <QVector>
+#include <map>
 
 class System
 {
@@ -23,6 +24,7 @@ private:
 	double _dim[3];
 	double _maxd;
 
+	std::multimap<u_int64_t, Particle*> _map;
 };
 
 #endif // SYSTEM_HH

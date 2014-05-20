@@ -46,6 +46,11 @@ void System::initRandomParticles(int n, double speed)
 		_ps.append(p);
 	}
 	computeMaxR();
+
+	_map.clear();
+	for (int i = 0; i < _ps.size(); ++i) {
+		_map.insert(std::make_pair(0, &_ps[i]));
+	}
 }
 
 int System::evolve(double dt)
@@ -83,6 +88,7 @@ int System::evolve(double dt)
 	}
 #endif
 
+//#define XSORT
 #ifdef XSORT
 	qSort(_ps.begin(), _ps.end(), [] (const Particle& a, const Particle& b) {return a.q[0] < b.q[0];});
 
@@ -90,10 +96,10 @@ int System::evolve(double dt)
 		Particle &pi = _ps[i];
 		for (int j = i-1; j >= 0
 			 && pi.q[0] - _ps[j].q[0] <= _maxd; --j)
-			count += Particle::collision(pi, _ps[j]);
+			count += Particle::collision(&pi, &_ps[j]);
 		for (int j = i+1; j < _ps.size()
 			 && _ps[j].q[0] - pi.q[0] <= _maxd; ++j)
-			count += Particle::collision(pi, _ps[j]);
+			count += Particle::collision(&pi, &_ps[j]);
 	}
 #endif
 
@@ -108,14 +114,14 @@ int System::evolve(double dt)
 	}
 
 	for (auto ic = map.constBegin(); ic != map.constEnd(); ++ic) {
+		quint64 key = ic.key();
 		for (int z = 0; z <= 1; ++z) {
 			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
-				quint64 key = ic.key();
 				quint64 keyBegin = key + z*(1ul<<40) + y*(1ul<<20) + (z==0 && y==0 ? 0 : -1);
 				quint64 keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
 				auto i = map.lowerBound(keyBegin);
 				while (i != map.constEnd() && i.key() <= keyEnd) {
-					count += Particle::collision(*ic.value(), *i.value());
+					count += Particle::collision(ic.value(), i.value());
 					++i;
 				}
 			}
@@ -126,22 +132,55 @@ int System::evolve(double dt)
 #define BOXSTL
 #ifdef BOXSTL
 	std::multimap<u_int64_t, Particle*> map;
+
 	for (int i = 0; i < _ps.size(); ++i) {
 		u_int64_t x = std::max(std::round((_ps[i].q[0]+_dim[0]) / _maxd), 0.0);
 		u_int64_t y = std::max(std::round((_ps[i].q[1]+_dim[1]) / _maxd), 0.0);
 		u_int64_t z = std::max(std::round((_ps[i].q[2]+_dim[2]) / _maxd), 0.0);
-		map.insert(std::make_pair((z<<40) + (y<<20) + x, &_ps[i]));
+		map.emplace((z<<40) + (y<<20) + x, &_ps[i]);
 	}
 
 	for (auto ic = map.cbegin(); ic != map.cend(); ++ic) {
+		u_int64_t key = ic->first;
 		for (int z = 0; z <= 1; ++z) {
 			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
-				u_int64_t key = ic->first;
 				u_int64_t keyBegin = key + z*(1ul<<40) + y*(1ul<<20) + (z==0 && y==0 ? 0 : -1);
 				u_int64_t keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
 				auto i = map.lower_bound(keyBegin);
 				while (i != map.cend() && i->first <= keyEnd) {
-					count += Particle::collision(*ic->second, *i->second);
+					count += Particle::collision(ic->second, i->second);
+					++i;
+				}
+			}
+		}
+	}
+#endif
+
+#ifdef BOXSTL2
+	for (auto ic = _map.begin(); ic != _map.end();) {
+		Particle* p = ic->second;
+		u_int64_t x = std::max(std::round((p->q[0]+_dim[0]) / _maxd), 0.0);
+		u_int64_t y = std::max(std::round((p->q[1]+_dim[1]) / _maxd), 0.0);
+		u_int64_t z = std::max(std::round((p->q[2]+_dim[2]) / _maxd), 0.0);
+		u_int64_t key = (z<<40) + (y<<20) + x;
+		if (key != ic->first) {
+			ic = _map.erase(ic);
+			_map.emplace(key, p);
+		} else {
+			++ic;
+		}
+	}
+	for (auto ic = _map.cbegin(); ic != _map.cend(); ++ic) {
+		Particle* p = ic->second;
+		u_int64_t key = ic->first;
+
+		for (int z = 0; z <= 1; ++z) {
+			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
+				u_int64_t keyBegin = key + z*(1ul<<40) + y*(1ul<<20) + (z==0 && y==0 ? 0 : -1);
+				u_int64_t keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
+				auto i = _map.lower_bound(keyBegin);
+				while (i != _map.cend() && i->first <= keyEnd) {
+					count += Particle::collision(p, i->second);
 					++i;
 				}
 			}
