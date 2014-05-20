@@ -228,5 +228,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>contractSpeedDoubleSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>165</x>
+     <y>213</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>168</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>

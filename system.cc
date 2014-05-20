@@ -3,6 +3,7 @@
 #include <QTime>
 #include <QDebug>
 #include <QMultiMap>
+#include <map>
 
 System::System()
 	: _contract(0.0)
@@ -26,13 +27,15 @@ void System::initRandomParticles(int n, double speed)
 		p.q[1] = rdm::uniformd(-_dim[1], _dim[1]);
 		p.q[2] = rdm::uniformd(-_dim[2], _dim[2]);
 
-		p.r = rdm::uniformd(1.2, 3.0);
+		double a = rdm::uniformd(1.0, 3.0);
+		p.r *= a;
+		p.m *= pow(a, 3.0);
 		p.p = Vec3::random(rdm::uniformd(0.0, speed)) * p.m;
 
 
 		// test 2D
-		p.q[2] = 0.0;
-		p.p[2] = 0.0;
+//		p.q[2] = 0.0;
+//		p.p[2] = 0.0;
 
 
 		//		p.color[0] = p.color[1] = double(i) / double(n);
@@ -71,8 +74,6 @@ int System::evolve(double dt)
 	}
 
 	// collisions entre les particules
-#define BOX
-
 #ifdef NAIVE
 	for (int i = 0; i < _ps.size(); ++i) {
 		for (int j = 0; j < _ps.size(); ++j) {
@@ -96,24 +97,52 @@ int System::evolve(double dt)
 	}
 #endif
 
+//#define BOX
 #ifdef BOX
-	QMultiMap<quint64, Particle*> cases;
+	QMultiMap<quint64, Particle*> map;
 	for (int i = 0; i < _ps.size(); ++i) {
-		quint64 x = (_ps[i].q[0]+_dim[0]) / _maxd;
-		quint64 y = (_ps[i].q[1]+_dim[1]) / _maxd;
-		quint64 z = (_ps[i].q[2]+_dim[2]) / _maxd;
-		cases.insert(z * (1ul<<40) + y * (1ul<<20) + x, &_ps[i]);
+		quint64 x = std::max(std::round((_ps[i].q[0]+_dim[0]) / _maxd), 0.0);
+		quint64 y = std::max(std::round((_ps[i].q[1]+_dim[1]) / _maxd), 0.0);
+		quint64 z = std::max(std::round((_ps[i].q[2]+_dim[2]) / _maxd), 0.0);
+		map.insert((z<<40) + (y<<20) + x, &_ps[i]);
 	}
 
-	for (auto ic = cases.constBegin(); ic != cases.constEnd(); ++ic) {
+	for (auto ic = map.constBegin(); ic != map.constEnd(); ++ic) {
 		for (int z = 0; z <= 1; ++z) {
 			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
-				for (int x = (z==0 && y==0 ? 0 : -1); x <= 1; ++x) {
-					quint64 key = ic.key() + z * (1ul<<40) + y * (1ul<<20) + x;
+				quint64 key = ic.key();
+				quint64 keyBegin = key + z*(1ul<<40) + y*(1ul<<20) + (z==0 && y==0 ? 0 : -1);
+				quint64 keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
+				auto i = map.lowerBound(keyBegin);
+				while (i != map.constEnd() && i.key() <= keyEnd) {
+					count += Particle::collision(*ic.value(), *i.value());
+					++i;
+				}
+			}
+		}
+	}
+#endif
 
-					for (auto it = cases.constFind(key); it != cases.constEnd() && it.key() == key; ++it) {
-						count += Particle::collision(*it.value(), *ic.value());
-					}
+#define BOXSTL
+#ifdef BOXSTL
+	std::multimap<u_int64_t, Particle*> map;
+	for (int i = 0; i < _ps.size(); ++i) {
+		u_int64_t x = std::max(std::round((_ps[i].q[0]+_dim[0]) / _maxd), 0.0);
+		u_int64_t y = std::max(std::round((_ps[i].q[1]+_dim[1]) / _maxd), 0.0);
+		u_int64_t z = std::max(std::round((_ps[i].q[2]+_dim[2]) / _maxd), 0.0);
+		map.insert(std::make_pair((z<<40) + (y<<20) + x, &_ps[i]));
+	}
+
+	for (auto ic = map.cbegin(); ic != map.cend(); ++ic) {
+		for (int z = 0; z <= 1; ++z) {
+			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
+				u_int64_t key = ic->first;
+				u_int64_t keyBegin = key + z*(1ul<<40) + y*(1ul<<20) + (z==0 && y==0 ? 0 : -1);
+				u_int64_t keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
+				auto i = map.lower_bound(keyBegin);
+				while (i != map.cend() && i->first <= keyEnd) {
+					count += Particle::collision(*ic->second, *i->second);
+					++i;
 				}
 			}
 		}
