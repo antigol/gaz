@@ -1,4 +1,5 @@
 #include "glwidget.hh"
+#include <QQueue>
 
 GLWidget::GLWidget(QWidget *parent)
 	: QGLWidget(parent)
@@ -99,10 +100,20 @@ void GLWidget::timerEvent(QTimerEvent *)
 	double dt = double(_t.restart()) / 1000.0;
 
 	int col = _sys.evolve(dt);
+	double ela = _t.elapsed();
 	qDebug() << col << "collisions";
-	qDebug() << "check collision = " << _t.elapsed() << "ms";
+//	qDebug() << "check collision = " << ela << "ms";
 
 	updateGL();
+
+	static QQueue<double> q;
+	static double sum = 0.0;
+	double N = 100;
+	sum += ela;
+	q.enqueue(ela);
+	while (q.size() > N)
+		sum -= q.dequeue();
+	qDebug() << "check collision = " << sum/N << "ms";
 }
 
 #include <QMouseEvent>
@@ -115,7 +126,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *e)
 {
 	QPointF d = e->pos() - mouseLastPos;
 	QMatrix4x4 m;
-	m.rotate(d.manhattanLength() * 0.5, d.y(), d.x(), 0.0);
+	if (e->buttons() & Qt::LeftButton)
+		m.rotate(d.manhattanLength() * 0.5, d.y(), d.x(), 0.0);
+	if (e->buttons() & Qt::RightButton)
+		m.translate(-d.x(), d.y(), 0.0);
 	_v = m * _v;
 	mouseLastPos = e->pos();
 }
@@ -125,31 +139,5 @@ void GLWidget::wheelEvent(QWheelEvent *e)
 {
 	QMatrix4x4 m;
 	m.translate(0, 0, e->delta() * 0.1);
-	_v = m * _v;
-}
-
-#include <QKeyEvent>
-void GLWidget::keyPressEvent(QKeyEvent *e)
-{
-	qDebug() << "key";
-	QGLWidget::keyPressEvent(e);
-
-	QMatrix4x4 m;
-
-	switch (e->key()) {
-	case Qt::Key_W:
-		m.translate(0.0, -1.0, 0.0);
-		break;
-	case Qt::Key_S:
-		m.translate(0.0, 1.0, 0.0);
-		break;
-	case Qt::Key_A:
-		m.translate(1.0, 0.0, 0.0);
-		break;
-	case Qt::Key_D:
-		m.translate(-1.0, 0.0, 0.0);
-		break;
-	}
-
 	_v = m * _v;
 }
