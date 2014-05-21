@@ -13,7 +13,7 @@ struct Particle
 	double r; // rayon
 	Vec3 color;
 
-	static int collision(Particle *a, Particle *b);
+	static void collision(Particle *a, Particle *b);
 };
 
 #endif // PARTICLE_HH

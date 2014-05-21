@@ -51,10 +51,13 @@ void GLWidget::initializeGL()
 	_p.bind();
 	_p.setUniformValue("light", QVector3D(1.0, 1.0, 1.0).normalized());
 
-	_sphere.initializeGL(20, 20);
+	_sphere.initializeGL(15, 15);
 	_v.translate(0.0, 0.0, -30.0);
 
 	glEnable(GL_DEPTH_TEST);
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	startTimer(0);
 	_t.start();
@@ -65,7 +68,7 @@ void GLWidget::resizeGL(int w, int h)
 	glViewport(0, 0, w, h);
 
 	QMatrix4x4 m;
-	m.perspective(50.0, qreal(w)/qreal(h?h:1), 1.0, 10000.0);
+	m.perspective(50.0, qreal(w)/qreal(h?h:1), 1.0, 100000.0);
 	_p.setUniformValue("proj", m);
 }
 
@@ -73,14 +76,50 @@ void GLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
-
 	_p.setUniformValue("view", _v);
 	_p.setUniformValue("nview", _v.normalMatrix());
 
 	QMatrix4x4 m;
+	m.scale(_sys._dim[0], _sys._dim[1], _sys._dim[2]);
+	_p.setUniformValue("model", m);
+	_p.setUniformValue("nmodel", m.normalMatrix());
+
+	_p.setUniformValue("color_ambiant", 1.0, 1.0, 1.0);
+	_p.setUniformValue("color_diffuse", 1.0, 1.0, 1.0);
+
+	static const GLfloat cube[24*3] = {
+		// x-
+		-1.0, -1.0, -1.0,
+		-1.0, +1.0, -1.0,
+		-1.0, +1.0, +1.0,
+		-1.0, -1.0, +1.0,
+
+		// x+
+		+1.0, -1.0, -1.0,
+		+1.0, +1.0, -1.0,
+		+1.0, +1.0, +1.0,
+		+1.0, -1.0, +1.0,
+
+		// z-
+		-1.0, -1.0, -1.0,
+		-1.0, +1.0, -1.0,
+		+1.0, +1.0, -1.0,
+		+1.0, -1.0, -1.0,
+
+		// z+
+		-1.0, -1.0, +1.0,
+		-1.0, +1.0, +1.0,
+		+1.0, +1.0, +1.0,
+		+1.0, -1.0, +1.0,
+	};
+	_p.enableAttributeArray(vertex);
+	_p.setAttributeArray(vertex, cube, 3);
+	glDrawArrays(GL_LINE_LOOP, 0, 4);
+	glDrawArrays(GL_LINE_LOOP, 4, 4);
+	glDrawArrays(GL_LINE_LOOP, 8, 4);
+	glDrawArrays(GL_LINE_LOOP, 12, 4);
+	_p.disableAttributeArray(vertex);
+
 	_sphere.bind();
 	_p.enableAttributeArray(vertex);
 	_p.setAttributeBuffer(vertex, GL_FLOAT, 0, 3);
@@ -103,10 +142,8 @@ void GLWidget::timerEvent(QTimerEvent *)
 {
 	double dt = double(_t.restart()) / 1000.0;
 
-	int col = _sys.evolve(dt);
+	_sys.evolve(dt);
 	double ela = _t.elapsed();
-//	qDebug() << col << "collisions";
-//	qDebug() << "check collision = " << ela << "ms";
 
 	updateGL();
 
@@ -117,8 +154,8 @@ void GLWidget::timerEvent(QTimerEvent *)
 	q.enqueue(ela);
 	while (q.size() > N)
 		sum -= q.dequeue();
-//	qDebug() << "check collision = " << sum/N << "ms";
-//	qDebug() << "total = " << _t.elapsed() << "ms";
+	qDebug() << "check collision = " << sum/N << "ms";
+	qDebug() << "total = " << _t.elapsed() << "ms";
 }
 
 #include <QMouseEvent>
@@ -143,6 +180,6 @@ void GLWidget::mouseMoveEvent(QMouseEvent *e)
 void GLWidget::wheelEvent(QWheelEvent *e)
 {
 	QMatrix4x4 m;
-	m.translate(0, 0, e->delta() * 0.1);
+	m.translate(0, 0, e->delta() * 0.05);
 	_v = m * _v;
 }

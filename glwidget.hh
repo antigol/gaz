@@ -18,6 +18,9 @@ public:
 	~GLWidget();
 
 	System _sys;
+
+public slots:
+
 private:
 	void initializeGL() override;
 	void resizeGL(int w, int h) override;

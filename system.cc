@@ -6,7 +6,6 @@
 #include <map>
 
 System::System()
-	: _contract(0.0)
 {
 }
 
@@ -53,14 +52,8 @@ void System::initRandomParticles(int n, double speed)
 	}
 }
 
-int System::evolve(double dt)
+void System::evolve(double dt)
 {
-	for (int k = 0; k < 3; ++k) {
-		_dim[k] -= dt * _contract;
-	}
-
-	int count = 0;
-
 	for (Particle& z : _ps)
 		z.q += z.p / z.m * dt;
 
@@ -83,7 +76,7 @@ int System::evolve(double dt)
 	for (int i = 0; i < _ps.size(); ++i) {
 		for (int j = 0; j < _ps.size(); ++j) {
 			if (i == j) continue;
-			count += Particle::collision(_ps[i], _ps[j]);
+			Particle::collision(_ps[i], _ps[j]);
 		}
 	}
 #endif
@@ -96,10 +89,10 @@ int System::evolve(double dt)
 		Particle &pi = _ps[i];
 		for (int j = i-1; j >= 0
 			 && pi.q[0] - _ps[j].q[0] <= _maxd; --j)
-			count += Particle::collision(&pi, &_ps[j]);
+			Particle::collision(&pi, &_ps[j]);
 		for (int j = i+1; j < _ps.size()
 			 && _ps[j].q[0] - pi.q[0] <= _maxd; ++j)
-			count += Particle::collision(&pi, &_ps[j]);
+			Particle::collision(&pi, &_ps[j]);
 	}
 #endif
 
@@ -121,7 +114,7 @@ int System::evolve(double dt)
 				quint64 keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
 				auto i = map.lowerBound(keyBegin);
 				while (i != map.constEnd() && i.key() <= keyEnd) {
-					count += Particle::collision(ic.value(), i.value());
+					Particle::collision(ic.value(), i.value());
 					++i;
 				}
 			}
@@ -148,7 +141,7 @@ int System::evolve(double dt)
 				u_int64_t keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
 				auto i = map.lower_bound(keyBegin);
 				while (i != map.cend() && i->first <= keyEnd) {
-					count += Particle::collision(ic->second, i->second);
+					Particle::collision(ic->second, i->second);
 					++i;
 				}
 			}
@@ -180,15 +173,13 @@ int System::evolve(double dt)
 				u_int64_t keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
 				auto i = _map.lower_bound(keyBegin);
 				while (i != _map.cend() && i->first <= keyEnd) {
-					count += Particle::collision(p, i->second);
+					Particle::collision(p, i->second);
 					++i;
 				}
 			}
 		}
 	}
 #endif
-
-	return count;
 }
 
 void System::initialize()

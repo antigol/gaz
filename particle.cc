@@ -8,10 +8,10 @@ Particle::Particle()
 	color = Vec3(1.0, 1.0, 1.0);
 }
 
-int Particle::collision(Particle *a, Particle *b)
+void Particle::collision(Particle *a, Particle *b)
 {
 	if (a == b)
-		return 0;
+		return;
 
 	Vec3 n = a->q - b->q;
 	double n_norm = Vec3::norm(n);
@@ -25,8 +25,5 @@ int Particle::collision(Particle *a, Particle *b)
 		// on retourne dans les coordonnées globales
 		a->p = a->m * vg + p_prim;
 		b->p = b->m * vg - p_prim;
-
-		return 1;
 	}
-	return 0;
 }
