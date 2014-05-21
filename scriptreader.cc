@@ -17,9 +17,13 @@ ScriptReader::ScriptReader(QObject *parent) :
 
 bool ScriptReader::run(System *s, const QString fileName)
 {
+	QTextStream err(stderr);
+
 	QFile scriptFile(fileName);
-	if (!scriptFile.open(QIODevice::ReadOnly))
+	if (!scriptFile.open(QIODevice::ReadOnly)) {
+		err << "Error : open file" << endl;
 		return false;
+	}
 
 	QTextStream stream(&scriptFile);
 	QString contents = stream.readAll();
@@ -30,7 +34,6 @@ bool ScriptReader::run(System *s, const QString fileName)
 	_eng.evaluate(contents, fileName);
 
 	if (_eng.hasUncaughtException()) {
-		QTextStream err(stderr);
 		err << _eng.uncaughtExceptionLineNumber() << ": "
 			<< _eng.uncaughtException().toString() << endl;
 		return false;
