@@ -65,13 +65,17 @@ void GLWidget::resizeGL(int w, int h)
 	glViewport(0, 0, w, h);
 
 	QMatrix4x4 m;
-	m.perspective(70.0, qreal(w)/qreal(h?h:1), 1.0, 10000.0);
+	m.perspective(50.0, qreal(w)/qreal(h?h:1), 1.0, 10000.0);
 	_p.setUniformValue("proj", m);
 }
 
 void GLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	_p.setUniformValue("view", _v);
 	_p.setUniformValue("nview", _v.normalMatrix());

@@ -2,14 +2,17 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <QScriptValueIterator>
 #include <iostream>
+#include "random.hh"
 
 ScriptReader::ScriptReader(QObject *parent) :
 	QObject(parent)
 {
 	QScriptValue v = _eng.newQObject(this, QScriptEngine::QtOwnership,
 									 QScriptEngine::ExcludeSuperClassContents | QScriptEngine::ExcludeChildObjects);
-	_eng.globalObject().setProperty("MAIN", v);
+
+	_eng.globalObject().setProperty("App", v);
 }
 
 bool ScriptReader::run(System *s, const QString fileName)
@@ -39,21 +42,50 @@ bool ScriptReader::run(System *s, const QString fileName)
 
 void ScriptReader::print(const QString &msg)
 {
-	qDebug() << msg;
+	QTextStream(stdout) << msg << endl;
 }
 
-void ScriptReader::addParticule(double x, double y, double z, double vx, double vy, double vz, double mass, double radius)
+void ScriptReader::position(double x, double y, double z)
 {
-	Particle p;
-	p.m = mass;
-	p.r = radius;
-	p.q = Vec3(x, y, z);
-	p.p = Vec3(vx, vy, vz) * mass;
-
-	_system->_ps.append(p);
+	_p.q = Vec3(x, y, z);
 }
 
-void ScriptReader::setDimension(double wx, double wy, double wz)
+void ScriptReader::momentum(double x, double y, double z)
 {
-	_system->setSizes(wx, wy, wz);
+	_p.p = Vec3(x, y, z);
+}
+
+void ScriptReader::mass(double m)
+{
+	_p.m = m;
+}
+
+void ScriptReader::radius(double r)
+{
+	_p.r = r;
+}
+
+void ScriptReader::color(double r, double g, double b)
+{
+	_p.color = Vec3(r, g, b);
+}
+
+void ScriptReader::addParticule()
+{
+	_system->_ps.append(_p);
+}
+
+void ScriptReader::dimension(double x, double y, double z)
+{
+	_system->setSizes(x, y, z);
+}
+
+double ScriptReader::rand(double a, double b) const
+{
+	return rdm::uniformd(a, b);
+}
+
+double ScriptReader::randn(double mu, double sigma) const
+{
+	return rdm::normal(mu, sigma);
 }
