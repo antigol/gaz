@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT       += core gui opengl script
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,7 +18,8 @@ SOURCES += main.cc\
     particle.cc \
     vec3.cc \
     glsphere.cc \
-    mainwindow.cc
+    mainwindow.cc \
+    scriptreader.cc
 
 HEADERS  += glwidget.hh \
     system.hh \
@@ -26,7 +27,8 @@ HEADERS  += glwidget.hh \
     vec3.hh \
     random.hh \
     glsphere.hh \
-    mainwindow.hh
+    mainwindow.hh \
+    scriptreader.hh
 
 QMAKE_CXXFLAGS += -std=c++11
 

@@ -18,8 +18,8 @@ public:
 	QVector<Particle> _ps;
 	double _contract;
 
+	void initialize();
 private:
-	void computeMaxR();
 
 	double _dim[3];
 	double _maxd;

@@ -3,8 +3,8 @@
 
 Particle::Particle()
 {
-	m = 1.67e-27;
-	r = 1.2;
+	m = 1.0;
+	r = 1.0;
 	color = Vec3(1.0, 1.0, 1.0);
 }
 

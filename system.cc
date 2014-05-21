@@ -45,7 +45,7 @@ void System::initRandomParticles(int n, double speed)
 
 		_ps.append(p);
 	}
-	computeMaxR();
+	initialize();
 
 	_map.clear();
 	for (int i = 0; i < _ps.size(); ++i) {
@@ -191,7 +191,7 @@ int System::evolve(double dt)
 	return count;
 }
 
-void System::computeMaxR()
+void System::initialize()
 {
 	_maxd = 0.0;
 	for (Particle& z : _ps)

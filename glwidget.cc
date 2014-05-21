@@ -52,7 +52,7 @@ void GLWidget::initializeGL()
 	_p.setUniformValue("light", QVector3D(1.0, 1.0, 1.0).normalized());
 
 	_sphere.initializeGL(20, 20);
-	_v.translate(0.0, 0.0, -10.0);
+	_v.translate(0.0, 0.0, -30.0);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -101,7 +101,7 @@ void GLWidget::timerEvent(QTimerEvent *)
 
 	int col = _sys.evolve(dt);
 	double ela = _t.elapsed();
-	qDebug() << col << "collisions";
+//	qDebug() << col << "collisions";
 //	qDebug() << "check collision = " << ela << "ms";
 
 	updateGL();
@@ -113,8 +113,8 @@ void GLWidget::timerEvent(QTimerEvent *)
 	q.enqueue(ela);
 	while (q.size() > N)
 		sum -= q.dequeue();
-	qDebug() << "check collision = " << sum/N << "ms";
-	qDebug() << "total = " << _t.elapsed() << "ms";
+//	qDebug() << "check collision = " << sum/N << "ms";
+//	qDebug() << "total = " << _t.elapsed() << "ms";
 }
 
 #include <QMouseEvent>
@@ -130,7 +130,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *e)
 	if (e->buttons() & Qt::LeftButton)
 		m.rotate(0.3*d.manhattanLength(), d.y(), d.x(), 0.0);
 	if (e->buttons() & Qt::RightButton)
-		m.translate(0.5*d.x(), -0.5*d.y(), 0.0);
+		m.translate(-0.5*d.x(), 0.5*d.y(), 0.0);
 	_v = m * _v;
 	mouseLastPos = e->pos();
 }
