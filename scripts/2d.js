@@ -18,7 +18,7 @@ for (i = 0; i < 300; ++i) {
 	var vel = App.rand(0, 5);
 	App.momentum(Math.cos(phi) * vel, Math.sin(phi) * vel, 0);
 
-	App.addParticule();
+	App.addParticle();
 }
 
 // sauf une
@@ -33,5 +33,5 @@ var phi = App.rand(0, 2 * Math.PI);
 var vel = App.rand(0, 5);
 App.momentum(Math.cos(phi) * vel, Math.sin(phi) * vel, 0);
 
-App.addParticule();
+App.addParticle();
 

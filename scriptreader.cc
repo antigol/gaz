@@ -15,7 +15,7 @@ ScriptReader::ScriptReader(QObject *parent) :
 	_eng.globalObject().setProperty("App", v);
 }
 
-bool ScriptReader::run(System *s, const QString fileName)
+bool ScriptReader::runFile(System *s, const QString fileName)
 {
 	QTextStream err(stderr);
 
@@ -41,6 +41,21 @@ bool ScriptReader::run(System *s, const QString fileName)
 
 	_system->initialize();
 	return true;
+}
+
+int ScriptReader::run(System *s, const QString code)
+{
+	_system = s;
+
+	_eng.evaluate(code);
+
+	if (_eng.hasUncaughtException()) {
+		error = _eng.uncaughtException().toString();
+		return _eng.uncaughtExceptionLineNumber();
+	}
+
+	_system->initialize();
+	return 0;
 }
 
 void ScriptReader::print(const QString &msg)
@@ -73,7 +88,7 @@ void ScriptReader::color(double r, double g, double b)
 	_p.color = Vec3(r, g, b);
 }
 
-void ScriptReader::addParticule()
+void ScriptReader::addParticle()
 {
 	_system->_ps.append(_p);
 }

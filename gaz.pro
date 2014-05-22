@@ -19,7 +19,8 @@ SOURCES += main.cc\
     vec3.cc \
     glsphere.cc \
     mainwindow.cc \
-    scriptreader.cc
+    scriptreader.cc \
+    scripteditor.cc
 
 HEADERS  += glwidget.hh \
     system.hh \
@@ -28,12 +29,12 @@ HEADERS  += glwidget.hh \
     random.hh \
     glsphere.hh \
     mainwindow.hh \
-    scriptreader.hh
+    scriptreader.hh \
+    scripteditor.hh
 
 QMAKE_CXXFLAGS += -std=c++11
 
 FORMS += \
-    widgettool.ui
+    scripteditor.ui
 
-RESOURCES += \
-    res.qrc
+RESOURCES +=

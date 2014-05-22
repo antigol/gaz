@@ -16,5 +16,5 @@ for (i = 0; i < n; ++i) {
 				 Math.sin(phi) * Math.sqrt(Math.pow(vel,2) - Math.pow(z,2)),
 				 z);
 
-	App.addParticule();
+	App.addParticle();
 }

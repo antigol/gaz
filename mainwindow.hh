@@ -3,10 +3,8 @@
 
 #include <QMainWindow>
 #include "glwidget.hh"
-
-namespace Ui {
-class WidgetTool;
-}
+#include "scriptreader.hh"
+#include "scripteditor.hh"
 
 class MainWindow : public QMainWindow
 {
@@ -20,7 +18,9 @@ private slots:
 
 private:
 	GLWidget* _gl;
-	Ui::WidgetTool *ui;
+
+	ScriptReader reader;
+	ScriptEditor* editor;
 };
 
 #endif // MAINWINDOW_HH

@@ -9,4 +9,4 @@ App.position(0, 0, 0);
 	
 App.color(1,0,0);
 	
-App.addParticule();
+App.addParticle();

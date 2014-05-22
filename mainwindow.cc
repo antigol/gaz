@@ -1,48 +1,47 @@
 #include "mainwindow.hh"
-#include "ui_widgettool.h"
 #include <QHBoxLayout>
 #include <QFormLayout>
+#include <QSplitter>
 #include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) :
-	QMainWindow(parent),
-	ui(new Ui::WidgetTool)
+	QMainWindow(parent)
 {
-	QWidget* cw = new QWidget(this);
-	QHBoxLayout *l = new QHBoxLayout(cw);
 
-	_gl = new GLWidget(cw);
-	l->addWidget(_gl);
+	QSplitter *splitter = new QSplitter(this);
 
-	QWidget* tool = new QWidget(this);
-	ui->setupUi(tool);
-	l->addWidget(tool);
+	_gl = new GLWidget(splitter);
 
-	connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(onSetClicked()));
+	splitter->addWidget(_gl);
 
-	setCentralWidget(cw);
+	editor = new ScriptEditor(splitter);
+
+	connect(editor, SIGNAL(edited()), this, SLOT(onSetClicked()));
+	splitter->addWidget(editor);
+
+	setCentralWidget(splitter);
 
 	QSettings s;
-	ui->nSpinBox->setValue(s.value("n", ui->nSpinBox->value()).toInt());
-	ui->speedDoubleSpinBox->setValue(s.value("speed", ui->speedDoubleSpinBox->value()).toDouble());
-	ui->dimXDoubleSpinBox->setValue(s.value("dimX", ui->dimXDoubleSpinBox->value()).toDouble());
-	ui->dimYDoubleSpinBox->setValue(s.value("dimY", ui->dimYDoubleSpinBox->value()).toDouble());
-	ui->dimZDoubleSpinBox->setValue(s.value("dimZ", ui->dimZDoubleSpinBox->value()).toDouble());
+	QString defaultCode = "App.dimension(40, 40, 40);\n"
+						  "App.radius(1);\n"
+						  "App.mass(1);\n"
+						  "App.color(1,0,0);\n"
+						  "App.position(App.rand(-20,20), App.rand(-20,20), App.rand(-20,20));\n"
+						  "App.momentum(0,0,0);\n"
+						  "App.addParticle();";
+	editor->setText(s.value("code", defaultCode).toString());
 }
 
 MainWindow::~MainWindow()
 {
 	QSettings s;
-	s.setValue("n", ui->nSpinBox->value());
-	s.setValue("speed", ui->speedDoubleSpinBox->value());
-	s.setValue("dimX", ui->dimXDoubleSpinBox->value());
-	s.setValue("dimY", ui->dimYDoubleSpinBox->value());
-	s.setValue("dimZ", ui->dimZDoubleSpinBox->value());
-	delete ui;
+	s.setValue("code", editor->text());
 }
 
 void MainWindow::onSetClicked()
 {
-	_gl->_sys.setSizes(ui->dimXDoubleSpinBox->value(), ui->dimYDoubleSpinBox->value(), ui->dimZDoubleSpinBox->value());
-	_gl->_sys.initRandomParticles(ui->nSpinBox->value(), ui->speedDoubleSpinBox->value());
+	_gl->_sys._ps.clear();
+	int line = reader.run(&_gl->_sys, editor->text());
+
+	editor->setLineError(line, reader.error);
 }

@@ -11,7 +11,7 @@ for (x = -15; x <= 15; x += 5) {
 	
 	App.color(c%2, c%3, c%5); ++c;
 	
-	App.addParticule();
+	App.addParticle();
 
 	App.momentum(0, 0, 0);
 }

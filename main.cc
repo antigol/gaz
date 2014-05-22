@@ -6,13 +6,14 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+	a.setApplicationName("gaz");
 
 	if (a.argc() == 2) {
 		GLWidget w;
 		w.show();
 
 		ScriptReader reader;
-		if (!reader.run(&w._sys, a.arguments().at(1)))
+		if (!reader.runFile(&w._sys, a.arguments().at(1)))
 			return 0;
 
 		return a.exec();
