@@ -1,6 +1,6 @@
 App.dimension(20, 20, 40);
 
-var n = 200;
+var n = 2500;
 for (i = 0; i < n; ++i) {
 	var r = App.rand(0.5, 1);
 	var m = Math.pow(r, 3);
@@ -19,13 +19,24 @@ for (i = 0; i < n; ++i) {
 
 App.color(1, 0, 0);
 
-App.radius(3);
-App.mass(27);
+App.radius(2);
+App.mass(8);
 
-App.position(-200, 0, 0);
-App.momentum(1000,0,0)
+var p = 200;
+
+App.position(-100, 0, 0);
+App.momentum(p,0,0)
 App.addParticle();
 
-App.position(200, 0, 0);
-App.momentum(-1000,0,0)
+App.position(100, 0, 0);
+App.momentum(-p,0,0)
 App.addParticle();
+
+App.position(0, -100, 0);
+App.momentum(0, p,0)
+App.addParticle();
+
+App.position(0, 100, 0);
+App.momentum(0,-p,0)
+App.addParticle();
+
