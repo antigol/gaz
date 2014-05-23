@@ -2,6 +2,7 @@
 #define MAINWINDOW_HH
 
 #include <QMainWindow>
+#include <QTimer>
 #include "glwidget.hh"
 #include "scriptreader.hh"
 #include "scripteditor.hh"
@@ -14,13 +15,15 @@ public:
 	~MainWindow();
 
 private slots:
-	void onSetClicked();
+	void code_edited();
+	void compile();
 
 private:
 	GLWidget* _gl;
 
 	ScriptReader reader;
 	ScriptEditor* editor;
+	QTimer timer;
 };
 
 #endif // MAINWINDOW_HH

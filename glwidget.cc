@@ -4,8 +4,7 @@
 GLWidget::GLWidget(QWidget *parent)
 	: QGLWidget(parent)
 {
-	setMinimumSize(300, 300);
-	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 }
 
 GLWidget::~GLWidget()
@@ -40,8 +39,8 @@ void GLWidget::initializeGL()
 							   "	vec3 e = normalize(_eye);\n"
 							   "	vec3 relf = e - 2.0 * dot(e, n) * n;\n"
 							   "	vec3 color = color_ambiant;"
-							   "	color += max(dot(n, light), 0.0) * color_diffuse;"
-							   "	color += pow(max(dot(relf, light), 0.0), 4.0) * vec3(1.0, 1.0, 1.0);"
+							   "	color += max(dot(n, light), 0.0) * color_diffuse;\n"
+							   "	color += pow(max(dot(relf, light), 0.0), 6.0) * vec3(1.0, 1.0, 1.0);\n"
 							   "	gl_FragColor = vec4(color, 1.0);"
 							   "}"
 							   );
@@ -51,7 +50,7 @@ void GLWidget::initializeGL()
 	_p.bind();
 	_p.setUniformValue("light", QVector3D(1.0, 1.0, 1.0).normalized());
 
-	_sphere.initializeGL(15, 15);
+	_sphere.initializeGL(20, 20);
 	_v.translate(0.0, 0.0, -30.0);
 
 	glEnable(GL_DEPTH_TEST);

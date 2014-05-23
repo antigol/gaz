@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QMultiMap>
 #include <map>
+#include <unordered_map>
 
 System::System()
 {
@@ -16,44 +17,9 @@ void System::setSizes(double x, double y, double z)
 	_dim[2] = z;
 }
 
-void System::initRandomParticles(int n, double speed)
-{
-	_ps.clear();
-	_ps.reserve(n);
-	for (int i = 0; i < n; ++i) {
-		Particle p;
-		p.q[0] = rdm::uniformd(-_dim[0], _dim[0]);
-		p.q[1] = rdm::uniformd(-_dim[1], _dim[1]);
-		p.q[2] = rdm::uniformd(-_dim[2], _dim[2]);
-
-		double a = rdm::uniformd(1.0, 3.0);
-		p.r *= a;
-		p.m *= pow(a, 3.0);
-		p.p = Vec3::random(rdm::uniformd(0.0, speed)) * p.m;
-
-
-		// test 2D
-//		p.q[2] = 0.0;
-//		p.p[2] = 0.0;
-
-
-		//		p.color[0] = p.color[1] = double(i) / double(n);
-		p.color[0] = p.color[1] = (p.q[0] + _dim[0]) / (2.0 * _dim[0]);
-		//		p.q[1] = i * 3.0;
-		//		p.p[1] = 10.0 * p.m;
-
-		_ps.append(p);
-	}
-	initialize();
-
-	_map.clear();
-	for (int i = 0; i < _ps.size(); ++i) {
-		_map.insert(std::make_pair(0, &_ps[i]));
-	}
-}
-
 void System::evolve(double dt)
 {
+	// évolution
 	for (Particle& z : _ps)
 		z.q += z.p / z.m * dt;
 
@@ -81,7 +47,7 @@ void System::evolve(double dt)
 	}
 #endif
 
-//#define XSORT
+	//#define XSORT
 #ifdef XSORT
 	qSort(_ps.begin(), _ps.end(), [] (const Particle& a, const Particle& b) {return a.q[0] < b.q[0];});
 
@@ -96,7 +62,7 @@ void System::evolve(double dt)
 	}
 #endif
 
-//#define BOX
+	//#define BOX
 #ifdef BOX
 	QMultiMap<quint64, Particle*> map;
 	for (int i = 0; i < _ps.size(); ++i) {
@@ -130,15 +96,14 @@ void System::evolve(double dt)
 		u_int64_t x = std::max(std::round((_ps[i].q[0]+_dim[0]) / _maxd), 0.0);
 		u_int64_t y = std::max(std::round((_ps[i].q[1]+_dim[1]) / _maxd), 0.0);
 		u_int64_t z = std::max(std::round((_ps[i].q[2]+_dim[2]) / _maxd), 0.0);
-		map.emplace((z<<40) + (y<<20) + x, &_ps[i]);
+		map.emplace((z<<42) + (y<<21) + x, &_ps[i]);
 	}
-
 	for (auto ic = map.cbegin(); ic != map.cend(); ++ic) {
 		u_int64_t key = ic->first;
 		for (int z = 0; z <= 1; ++z) {
 			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
-				u_int64_t keyBegin = key + z*(1ul<<40) + y*(1ul<<20) + (z==0 && y==0 ? 0 : -1);
-				u_int64_t keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
+				u_int64_t keyBegin = key + z*(1ul<<42) + y*(1ul<<21) + (z==0 && y==0 ? 0 : -1);
+				u_int64_t keyEnd   = key + z*(1ul<<42) + y*(1ul<<21) + 1;
 				auto i = map.lower_bound(keyBegin);
 				while (i != map.cend() && i->first <= keyEnd) {
 					Particle::collision(ic->second, i->second);
@@ -155,7 +120,7 @@ void System::evolve(double dt)
 		u_int64_t x = std::max(std::round((p->q[0]+_dim[0]) / _maxd), 0.0);
 		u_int64_t y = std::max(std::round((p->q[1]+_dim[1]) / _maxd), 0.0);
 		u_int64_t z = std::max(std::round((p->q[2]+_dim[2]) / _maxd), 0.0);
-		u_int64_t key = (z<<40) + (y<<20) + x;
+		u_int64_t key = (z<<42) + (y<<21) + x;
 		if (key != ic->first) {
 			ic = _map.erase(ic);
 			_map.emplace(key, p);
@@ -169,12 +134,39 @@ void System::evolve(double dt)
 
 		for (int z = 0; z <= 1; ++z) {
 			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
-				u_int64_t keyBegin = key + z*(1ul<<40) + y*(1ul<<20) + (z==0 && y==0 ? 0 : -1);
-				u_int64_t keyEnd   = key + z*(1ul<<40) + y*(1ul<<20) + 1;
+				u_int64_t keyBegin = key + z*(1ul<<42) + y*(1ul<<21) + (z==0 && y==0 ? 0 : -1);
+				u_int64_t keyEnd   = key + z*(1ul<<42) + y*(1ul<<21) + 1;
 				auto i = _map.lower_bound(keyBegin);
 				while (i != _map.cend() && i->first <= keyEnd) {
 					Particle::collision(p, i->second);
 					++i;
+				}
+			}
+		}
+	}
+#endif
+
+	//#define HASH
+#ifdef HASH
+	std::unordered_multimap<u_int64_t, Particle*> map;
+
+	for (int i = 0; i < _ps.size(); ++i) {
+		u_int64_t x = std::max(std::round((_ps[i].q[0]+_dim[0]) / _maxd), 0.0);
+		u_int64_t y = std::max(std::round((_ps[i].q[1]+_dim[1]) / _maxd), 0.0);
+		u_int64_t z = std::max(std::round((_ps[i].q[2]+_dim[2]) / _maxd), 0.0);
+		map.emplace((z<<42) + (y<<21) + x, &_ps[i]);
+	}
+	for (auto ic = map.cbegin(); ic != map.cend(); ++ic) {
+		u_int64_t key = ic->first;
+		for (int z = 0; z <= 1; ++z) {
+			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
+				for (int x = (z==0 && y==0 ? 0 : -1); x <= 1; ++x) {
+					u_int64_t key2 = key + z*(1ul<<42) + y*(1ul<<21) + x;
+					auto i = map.find(key2);
+					while (i != map.cend()) {
+						Particle::collision(ic->second, i->second);
+						++i;
+					}
 				}
 			}
 		}
@@ -187,7 +179,12 @@ void System::initialize()
 	_maxd = 0.0;
 	for (Particle& z : _ps)
 		_maxd = qMax(_maxd, z.r);
-	_maxd *= 2.0;
+	_maxd *= 2.0001;
+
+	_map.clear();
+	for (int i = 0; i < _ps.size(); ++i) {
+		_map.insert(std::make_pair(0, &_ps[i]));
+	}
 }
 
 // pour 5000

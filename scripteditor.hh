@@ -2,6 +2,7 @@
 #define SCRIPTEDITOR_HH
 
 #include <QWidget>
+#include <QTextEdit>
 
 namespace Ui {
 class ScriptEditor;
@@ -16,17 +17,22 @@ public:
 	~ScriptEditor();
 
 	void setLineError(int line, const QString& errorText);
-	void setText(const QString& text);
-	QString text() const;
+	QString currentCode() const;
 
 signals:
 	void edited();
 
 private slots:
 	void slot_edited();
+	void slot_close_tab(int index);
+	void slot_new();
+	void slot_open();
 
 private:
+	void add_tab(const QString &name, const QString &code);
+
 	Ui::ScriptEditor *ui;
+	QList<QTextEdit*> ts;
 };
 
 #include <QSyntaxHighlighter>
@@ -34,7 +40,7 @@ private:
 class Highlighter : public QSyntaxHighlighter
 {
 public:
-	Highlighter(QObject * parent);
+	Highlighter(QTextEdit * parent);
 
 private:
 	void highlightBlock(const QString& text);

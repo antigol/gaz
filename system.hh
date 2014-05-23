@@ -11,7 +11,6 @@ public:
 	System();
 
 	void setSizes(double x, double y, double z);
-	void initRandomParticles(int n, double speed);
 
 	void evolve(double dt);
 

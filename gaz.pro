@@ -6,6 +6,11 @@
 
 QT       += core gui opengl script
 
+QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -fopenmp
+
+LIBS += -fopenmp
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = gaz
@@ -32,9 +37,5 @@ HEADERS  += glwidget.hh \
     scriptreader.hh \
     scripteditor.hh
 
-QMAKE_CXXFLAGS += -std=c++11
-
 FORMS += \
     scripteditor.ui
-
-RESOURCES +=

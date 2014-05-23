@@ -16,32 +16,37 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	editor = new ScriptEditor(splitter);
 
-	connect(editor, SIGNAL(edited()), this, SLOT(onSetClicked()));
+	connect(editor, SIGNAL(edited()), this, SLOT(code_edited()));
+	connect(&timer, SIGNAL(timeout()), this, SLOT(compile()));
+	timer.setSingleShot(true);
 	splitter->addWidget(editor);
 
 	setCentralWidget(splitter);
 
-	QSettings s;
-	QString defaultCode = "App.dimension(40, 40, 40);\n"
-						  "App.radius(1);\n"
-						  "App.mass(1);\n"
-						  "App.color(1,0,0);\n"
-						  "App.position(App.rand(-20,20), App.rand(-20,20), App.rand(-20,20));\n"
-						  "App.momentum(0,0,0);\n"
-						  "App.addParticle();";
-	editor->setText(s.value("code", defaultCode).toString());
+	QSettings settings;
+	splitter->restoreState(settings.value("splitterSizes").toByteArray());
+	setGeometry(settings.value("geometry", geometry()).toRect());
+	compile();
 }
 
 MainWindow::~MainWindow()
 {
-	QSettings s;
-	s.setValue("code", editor->text());
+	QSplitter* splitter = qobject_cast<QSplitter*>(centralWidget());
+	QSettings settings;
+	if (splitter) {
+		settings.setValue("splitterSizes", splitter->saveState());
+	}
+	settings.setValue("geometry", geometry());
 }
 
-void MainWindow::onSetClicked()
+void MainWindow::code_edited()
+{
+	timer.start(1000);
+}
+
+void MainWindow::compile()
 {
 	_gl->_sys._ps.clear();
-	int line = reader.run(&_gl->_sys, editor->text());
-
+	int line = reader.run(&_gl->_sys, editor->currentCode());
 	editor->setLineError(line, reader.error);
 }
