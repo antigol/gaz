@@ -6,10 +6,9 @@
 
 QT       += core gui opengl script
 
-QMAKE_CXXFLAGS += -std=c++11
-QMAKE_CXXFLAGS += -fopenmp
+CONFIG += c++11
 
-LIBS += -fopenmp
+QMAKE_CXXFLAGS += -std=c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

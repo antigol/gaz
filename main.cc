@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	a.setOrganizationName("geiger");
 	a.setApplicationName("gaz");
 
-	if (a.argc() == 2) {
+	if (a.arguments().size() == 2) {
 		GLWidget w;
 		w.show();
 
