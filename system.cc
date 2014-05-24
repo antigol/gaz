@@ -47,7 +47,7 @@ void System::evolve(double dt)
 	}
 #endif
 
-	//#define XSORT
+#define XSORT
 #ifdef XSORT
 	qSort(_ps.begin(), _ps.end(), [] (const Particle& a, const Particle& b) {return a.q[0] < b.q[0];});
 
@@ -88,7 +88,7 @@ void System::evolve(double dt)
 	}
 #endif
 
-#define BOXSTL
+//#define BOXSTL
 #ifdef BOXSTL
 	std::multimap<u_int64_t, Particle*> map;
 

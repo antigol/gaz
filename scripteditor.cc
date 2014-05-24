@@ -33,6 +33,9 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
 	for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
 		add_tab(it.key(), it.value().toString());
 	}
+
+	int index = s.value("tabIndex", 0).toInt();
+	ui->tabWidget->setCurrentIndex(index);
 }
 
 ScriptEditor::~ScriptEditor()
@@ -43,6 +46,7 @@ ScriptEditor::~ScriptEditor()
 		map.insert(ui->tabWidget->tabText(i), ts[i]->toPlainText());
 	}
 	s.setValue("code", map);
+	s.setValue("tabIndex", ui->tabWidget->currentIndex());
 	delete ui;
 }
 
