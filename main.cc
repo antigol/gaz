@@ -6,6 +6,7 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+	a.setOrganizationName("geiger");
 	a.setApplicationName("gaz");
 
 	if (a.argc() == 2) {
@@ -13,7 +14,7 @@ int main(int argc, char *argv[])
 		w.show();
 
 		ScriptReader reader;
-		if (!reader.runFile(&w._sys, a.arguments().at(1)))
+		if (!reader.runFile(&w.sys, a.arguments().at(1)))
 			return 0;
 
 		return a.exec();

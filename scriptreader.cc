@@ -90,7 +90,7 @@ void ScriptReader::color(double r, double g, double b)
 
 void ScriptReader::addParticle()
 {
-	_system->_ps.append(_p);
+	_system->ps.push_back(_p);
 }
 
 void ScriptReader::dimension(double x, double y, double z)

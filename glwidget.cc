@@ -1,14 +1,20 @@
 #include "glwidget.hh"
 #include <QQueue>
+#include <QSettings>
 
 GLWidget::GLWidget(QWidget *parent)
 	: QGLWidget(parent)
 {
 	setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+	QSettings s;
+	_v = s.value("MATRIXVIEW", QMatrix4x4()).value<QMatrix4x4>();
 }
 
 GLWidget::~GLWidget()
 {
+	QSettings s;
+	s.setValue("MATRIXVIEW", _v);
 }
 
 constexpr int vertex = 0;
@@ -51,7 +57,6 @@ void GLWidget::initializeGL()
 	_p.setUniformValue("light", QVector3D(1.0, 1.0, 1.0).normalized());
 
 	_sphere.initializeGL(20, 20);
-	_v.translate(0.0, 0.0, -30.0);
 
 	glEnable(GL_DEPTH_TEST);
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -79,7 +84,7 @@ void GLWidget::paintGL()
 	_p.setUniformValue("nview", _v.normalMatrix());
 
 	QMatrix4x4 m;
-	m.scale(_sys._dim[0], _sys._dim[1], _sys._dim[2]);
+	m.scale(sys._dim[0], sys._dim[1], sys._dim[2]);
 	_p.setUniformValue("model", m);
 	_p.setUniformValue("nmodel", m.normalMatrix());
 
@@ -122,7 +127,7 @@ void GLWidget::paintGL()
 	_sphere.bind();
 	_p.enableAttributeArray(vertex);
 	_p.setAttributeBuffer(vertex, GL_FLOAT, 0, 3);
-	for (const Particle& z : _sys._ps) {
+	for (const Particle& z : sys.ps) {
 		m.setToIdentity();
 		m.translate(z.q[0], z.q[1], z.q[2]);
 		m.scale(z.r);
@@ -141,14 +146,14 @@ void GLWidget::timerEvent(QTimerEvent *)
 {
 	double dt = double(_t.restart()) / 1000.0;
 
-	_sys.evolve(dt);
+	sys.evolve(dt);
 	double ela = _t.elapsed();
 
 	updateGL();
 
 	static QQueue<double> q;
 	static double sum = 0.0;
-	double N = 100;
+	double N = 30;
 	sum += ela;
 	q.enqueue(ela);
 	while (q.size() > N)
@@ -160,19 +165,19 @@ void GLWidget::timerEvent(QTimerEvent *)
 #include <QMouseEvent>
 void GLWidget::mousePressEvent(QMouseEvent *e)
 {
-	mouseLastPos = e->pos();
+	_mouseLastPos = e->pos();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *e)
 {
-	QPointF d = e->pos() - mouseLastPos;
+	QPointF d = e->pos() - _mouseLastPos;
 	QMatrix4x4 m;
 	if (e->buttons() & Qt::LeftButton)
 		m.rotate(0.3*d.manhattanLength(), d.y(), d.x(), 0.0);
 	if (e->buttons() & Qt::RightButton)
 		m.translate(-0.5*d.x(), 0.5*d.y(), 0.0);
 	_v = m * _v;
-	mouseLastPos = e->pos();
+	_mouseLastPos = e->pos();
 }
 
 #include <QWheelEvent>

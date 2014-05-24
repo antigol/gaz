@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QComboBox>
 #include "glwidget.hh"
 #include "scriptreader.hh"
 #include "scripteditor.hh"
@@ -15,15 +16,17 @@ public:
 	~MainWindow();
 
 private slots:
-	void code_edited();
-	void compile();
+	void slot_code_edited();
+	void slot_compile();
+	void slot_algo_changed();
 
 private:
-	GLWidget* _gl;
+	GLWidget* viewWidget;
 
 	ScriptReader reader;
 	ScriptEditor* editor;
 	QTimer timer;
+	QComboBox *comboBox;
 };
 
 #endif // MAINWINDOW_HH

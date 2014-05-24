@@ -3,6 +3,9 @@
 #include <QFormLayout>
 #include <QSplitter>
 #include <QSettings>
+#include <QMenuBar>
+#include <QWidgetAction>
+#include <QStringList>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent)
@@ -10,14 +13,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	QSplitter *splitter = new QSplitter(this);
 
-	_gl = new GLWidget(splitter);
+	viewWidget = new GLWidget(splitter);
 
-	splitter->addWidget(_gl);
+	splitter->addWidget(viewWidget);
 
 	editor = new ScriptEditor(splitter);
 
-	connect(editor, SIGNAL(edited()), this, SLOT(code_edited()));
-	connect(&timer, SIGNAL(timeout()), this, SLOT(compile()));
+	connect(editor, SIGNAL(edited()), this, SLOT(slot_code_edited()));
+	connect(&timer, SIGNAL(timeout()), this, SLOT(slot_compile()));
 	timer.setSingleShot(true);
 	splitter->addWidget(editor);
 
@@ -26,7 +29,19 @@ MainWindow::MainWindow(QWidget *parent) :
 	QSettings settings;
 	splitter->restoreState(settings.value("splitterSizes").toByteArray());
 	setGeometry(settings.value("geometry", geometry()).toRect());
-	compile();
+	slot_compile();
+
+
+	QMenu* menu = menuBar()->addMenu("algorithm");
+
+	comboBox = new QComboBox(menu);
+	QWidgetAction *action = new QWidgetAction(menu);
+	action->setDefaultWidget(comboBox);
+	menu->addAction(action);
+
+	comboBox->addItems(QStringList() << "multimap" << "x sort" << "naive");
+
+	connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_algo_changed()));
 }
 
 MainWindow::~MainWindow()
@@ -39,14 +54,19 @@ MainWindow::~MainWindow()
 	settings.setValue("geometry", geometry());
 }
 
-void MainWindow::code_edited()
+void MainWindow::slot_code_edited()
 {
 	timer.start(1000);
 }
 
-void MainWindow::compile()
+void MainWindow::slot_compile()
 {
-	_gl->_sys._ps.clear();
-	int line = reader.run(&_gl->_sys, editor->currentCode());
+	viewWidget->sys.ps.clear();
+	int line = reader.run(&viewWidget->sys, editor->currentCode());
 	editor->setLineError(line, reader.error);
+}
+
+void MainWindow::slot_algo_changed()
+{
+	viewWidget->sys.algorithm = comboBox->currentIndex();
 }

@@ -17,7 +17,7 @@ public:
 	GLWidget(QWidget *parent = 0);
 	~GLWidget();
 
-	System _sys;
+	System sys;
 
 public slots:
 
@@ -38,7 +38,7 @@ private:
 
 	GLSphere _sphere;
 
-	QPointF mouseLastPos;
+	QPointF _mouseLastPos;
 };
 
 #endif // GLWIDGET_HH

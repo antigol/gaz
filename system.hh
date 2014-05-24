@@ -2,7 +2,7 @@
 #define SYSTEM_HH
 
 #include "particle.hh"
-#include <QVector>
+#include <vector>
 #include <map>
 
 class System
@@ -14,15 +14,18 @@ public:
 
 	void evolve(double dt);
 
-	QVector<Particle> _ps;
+	std::vector<Particle> ps;
 	double _dim[3];
+	int algorithm;
 
 	void initialize();
 private:
+	void naive();
+	void x_sort();
+	void multimap();
 
 	double _maxd;
-
-	std::multimap<u_int64_t, Particle*> _map;
+	std::vector<Particle*> ptr_ps;
 };
 
 #endif // SYSTEM_HH
