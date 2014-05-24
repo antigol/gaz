@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	setGeometry(settings.value("geometry", geometry()).toRect());
 
 
+	menuBar()->addAction("restart", this, SLOT(slot_compile()));
 
 	QMenu* menu = menuBar()->addMenu("algorithm");
 

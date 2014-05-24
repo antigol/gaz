@@ -1,12 +1,15 @@
 #include "glwidget.hh"
 #include <QQueue>
 #include <QSettings>
+#include <QPainter>
 #include <iostream>
 
 GLWidget::GLWidget(QWidget *parent)
-	: QGLWidget(parent)
+	: QGLWidget(parent), limited(false)
 {
 	setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+	setAutoFillBackground(false);
 
 	QSettings s;
 	_v = s.value("MATRIXVIEW", QMatrix4x4()).value<QMatrix4x4>();
@@ -59,11 +62,6 @@ void GLWidget::initializeGL()
 
 	_sphere.initializeGL(20, 20);
 
-	glEnable(GL_DEPTH_TEST);
-	glPolygonMode(GL_FRONT, GL_FILL);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-
 	startTimer(0);
 	_t.start();
 }
@@ -74,6 +72,7 @@ void GLWidget::resizeGL(int w, int h)
 
 	QMatrix4x4 m;
 	m.perspective(50.0, qreal(w)/qreal(h?h:1), 1.0, 100000.0);
+	_p.bind();
 	_p.setUniformValue("proj", m);
 }
 
@@ -81,6 +80,12 @@ void GLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glEnable(GL_DEPTH_TEST);
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	_p.bind();
 	_p.setUniformValue("view", _v);
 	_p.setUniformValue("nview", _v.normalMatrix());
 
@@ -141,20 +146,33 @@ void GLWidget::paintGL()
 	}
 	_p.disableAttributeArray(vertex);
 	_sphere.release();
+
+	if (limited) {
+		QPainter p;
+		p.begin(this);
+		p.setPen(Qt::red);
+		p.setFont(QFont(QString::fromUtf8("DejaVu Sans Mono")));
+		p.drawText(QPointF(10.0, 20.0), "Simulation slowed (not in real time)");
+		p.end();
+	}
 }
 
 void GLWidget::timerEvent(QTimerEvent *)
 {
 	double dt = double(_t.restart()) / 1000.0;
+	dt /= 2.0;
 
 	double dtmin = 0.03;
-	if (dt > dtmin) {
+	limited = (dt > dtmin);
+	if (limited) {
 		std::cerr << "dt is bigger than "<<dtmin<<"s (set to "<<dtmin<<"s)" << std::endl;
 		dt = dtmin;
 	}
 
 	sys.evolve(dt);
+	sys.evolve(dt);
 	double ela = _t.elapsed();
+	ela /= 2.0;
 
 	updateGL();
 

@@ -39,6 +39,7 @@ private:
 	GLSphere _sphere;
 
 	QPointF _mouseLastPos;
+	bool limited;
 };
 
 #endif // GLWIDGET_HH
