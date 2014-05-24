@@ -1,6 +1,7 @@
 #include "glwidget.hh"
 #include <QQueue>
 #include <QSettings>
+#include <iostream>
 
 GLWidget::GLWidget(QWidget *parent)
 	: QGLWidget(parent)
@@ -146,6 +147,12 @@ void GLWidget::timerEvent(QTimerEvent *)
 {
 	double dt = double(_t.restart()) / 1000.0;
 
+	double dtmin = 0.03;
+	if (dt > dtmin) {
+		std::cerr << "dt is bigger than "<<dtmin<<"s (set to "<<dtmin<<"s)" << std::endl;
+		dt = dtmin;
+	}
+
 	sys.evolve(dt);
 	double ela = _t.elapsed();
 
@@ -158,8 +165,8 @@ void GLWidget::timerEvent(QTimerEvent *)
 	q.enqueue(ela);
 	while (q.size() > N)
 		sum -= q.dequeue();
-	qDebug() << "check collision = " << sum/N << "ms";
-	qDebug() << "total = " << _t.elapsed() << "ms";
+	std::cout << "check collision = " << sum/N << "ms" << std::endl;
+	std::cout << "total = " << _t.elapsed() << "ms" << std::endl;
 }
 
 #include <QMouseEvent>

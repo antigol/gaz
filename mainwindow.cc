@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QSettings settings;
 	splitter->restoreState(settings.value("splitterSizes").toByteArray());
 	setGeometry(settings.value("geometry", geometry()).toRect());
-	slot_compile();
+
 
 
 	QMenu* menu = menuBar()->addMenu("algorithm");

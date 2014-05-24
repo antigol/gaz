@@ -38,6 +38,7 @@ void System::evolve(double dt)
 		}
 	}
 
+	// collision avec les particules
 	switch (algorithm) {
 	case 0:
 		multimap();
