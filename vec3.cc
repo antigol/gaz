@@ -57,6 +57,11 @@ Vec3 &Vec3::operator/=(double a)
 	return *this;
 }
 
+bool Vec3::isNull() const
+{
+	return _d[0] == 0.0 && _d[1] == 0.0 && _d[2] == 0.0;
+}
+
 double Vec3::dot(const Vec3 &a, const Vec3 &b)
 {
 	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];

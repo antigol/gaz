@@ -33,6 +33,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	menuBar()->addAction("restart", this, SLOT(slot_compile()));
 
+	QAction* action_pause = menuBar()->addAction("pause", viewWidget, SLOT(pause()));
+	action_pause->setCheckable(true);
+	action_pause->setChecked(false);
+
 	QMenu* menu = menuBar()->addMenu("algorithm");
 
 	comboBox = new QComboBox(menu);
@@ -65,6 +69,10 @@ void MainWindow::slot_compile()
 	viewWidget->sys.ps.clear();
 	int line = reader.run(&viewWidget->sys, editor->currentCode());
 	editor->setLineError(line, reader.error);
+	if (line != 0) {
+		viewWidget->sys.ps.clear();
+		viewWidget->sys.initialize();
+	}
 }
 
 void MainWindow::slot_algo_changed()

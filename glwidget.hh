@@ -20,6 +20,7 @@ public:
 	System sys;
 
 public slots:
+	void pause();
 
 private:
 	void initializeGL() override;
@@ -40,6 +41,7 @@ private:
 
 	QPointF _mouseLastPos;
 	bool limited;
+	bool _pause;
 };
 
 #endif // GLWIDGET_HH

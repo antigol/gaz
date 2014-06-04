@@ -5,7 +5,7 @@
 #include <iostream>
 
 GLWidget::GLWidget(QWidget *parent)
-	: QGLWidget(parent), limited(false)
+	: QGLWidget(parent), limited(false), _pause(false)
 {
 	setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
@@ -19,6 +19,11 @@ GLWidget::~GLWidget()
 {
 	QSettings s;
 	s.setValue("MATRIXVIEW", _v);
+}
+
+void GLWidget::pause()
+{
+	_pause = !_pause;
 }
 
 constexpr int vertex = 0;
@@ -169,8 +174,10 @@ void GLWidget::timerEvent(QTimerEvent *)
 		dt = dtmin;
 	}
 
-	sys.evolve(dt);
-	sys.evolve(dt);
+	if (!_pause) {
+		sys.evolve(dt);
+		sys.evolve(dt);
+	}
 	double ela = _t.elapsed();
 	ela /= 2.0;
 
