@@ -22,7 +22,6 @@ public slots:
 	void pause();
 
 private slots:
-	void simulation_finished();
 
 private:
 	void initializeGL() override;

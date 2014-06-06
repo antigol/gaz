@@ -1,5 +1,4 @@
 #include "glwidget.hh"
-#include <QQueue>
 #include <QSettings>
 #include <QPainter>
 #include <iostream>
@@ -13,8 +12,6 @@ GLWidget::GLWidget(QWidget *parent)
 
 	QSettings s;
 	_v = s.value("MATRIXVIEW", QMatrix4x4()).value<QMatrix4x4>();
-
-	connect(&sys, SIGNAL(finished()), this, SLOT(simulation_finished()));
 }
 
 GLWidget::~GLWidget()
@@ -29,35 +26,6 @@ void GLWidget::pause()
 		sys.stop();
 	else
 		sys.start();
-}
-
-void GLWidget::simulation_finished()
-{
-//	double div = 5;
-//	double dt = double(_t.restart()) / 1000.0;
-
-//	updateGL();
-
-//	static QQueue<double> q;
-//	static double sum = 0.0;
-//	double N = 30;
-//	sum += dt;
-//	q.enqueue(dt);
-//	while (q.size() > N)
-//		sum -= q.dequeue();
-
-//	std::cout << "total ("<<div<<"check) = " << 1000.0*sum/N << "ms" << std::endl;
-//	std::cout << "opengl = " << _t.elapsed() << "ms" << std::endl;
-
-//	double dtmin = 0.03*div;
-//	limited = (dt > dtmin);
-//	if (limited) {
-//		std::cerr << "dt=" << dt << " is bigger than "<<dtmin<<"s (set to "<<dtmin<<"s)" << std::endl;
-//		dt = dtmin;
-//	}
-
-//	if (!_pause) {
-//	}
 }
 
 constexpr int vertex = 0;
@@ -172,7 +140,7 @@ void GLWidget::paintGL()
 	_sphere.bind();
 	_p.enableAttributeArray(vertex);
 	_p.setAttributeBuffer(vertex, GL_FLOAT, 0, 3);
-//	sys.pause(true);
+
 	for (const Particle& z : sys.ps) {
 		m.setToIdentity();
 		m.translate(z.q[0], z.q[1], z.q[2]);
@@ -184,7 +152,7 @@ void GLWidget::paintGL()
 
 		_sphere.drawElements();
 	}
-//	sys.pause(false);
+
 	_p.disableAttributeArray(vertex);
 	_sphere.release();
 

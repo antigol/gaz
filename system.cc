@@ -3,8 +3,10 @@
 #include <QTime>
 #include <QDebug>
 #include <QMultiMap>
+#include <QQueue>
 #include <map>
 #include <unordered_map>
+#include <iostream>
 
 System::System()
 	: algorithm(0)
@@ -142,17 +144,37 @@ void System::multimap()
 
 void System::run()
 {
+	QTime time, stats_time;
 	time.start();
+	stats_time.start();
 	_stop = false;
 	_pause = false;
+
+	QQueue<double> stats;
+	double stats_sum = 0.0;
+	int stats_n = 50;
 
 	while (!_stop) {
 		while (!_mutex.tryLock())
 			msleep(10);
 		double dt = double(time.restart())/1000.0;
+		stats_sum += dt;
+		stats.enqueue(dt);
 		limited = dt > _dt && (dt = _dt);
 		evolve(dt);
 		_mutex.unlock();
 		msleep(1);
+
+		while (stats.size() > stats_n)
+			stats_sum -= stats.dequeue();
+
+		if (stats_time.elapsed() > 1000) {
+			stats_time.restart();
+			using namespace std;
+			cout << "Time for collision check & interaction : "
+				 << stats_sum / stats_n * 1000.0
+				 << " ms (mean on " << stats_n << " values)"
+				 << endl;
+		}
 	}
 }

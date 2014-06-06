@@ -38,7 +38,6 @@ private:
 	bool _stop;
 	bool _pause;
 	QMutex _mutex;
-	QTime time;
 
 protected:
 	void run() override;
