@@ -8,11 +8,14 @@
 
 System::System()
 	: algorithm(0)
+	, limited(false)
 {
+	_dt = 10e-3;
 }
 
 System::~System()
 {
+	stop();
 	wait();
 }
 
@@ -60,6 +63,21 @@ void System::evolve(double dt)
 		naive();
 		break;
 	}
+}
+
+void System::stop()
+{
+	_stop = true;
+}
+
+void System::pause(bool on)
+{
+	if (on && !_pause)
+		_mutex.lock();
+	if (!on && _pause)
+		_mutex.unlock();
+
+	_pause = on;
 }
 
 void System::initialize()
@@ -124,6 +142,17 @@ void System::multimap()
 
 void System::run()
 {
-	for (double dt : dts)
+	time.start();
+	_stop = false;
+	_pause = false;
+
+	while (!_stop) {
+		while (!_mutex.tryLock())
+			msleep(10);
+		double dt = double(time.restart())/1000.0;
+		limited = dt > _dt && (dt = _dt);
 		evolve(dt);
+		_mutex.unlock();
+		msleep(1);
+	}
 }

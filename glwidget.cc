@@ -5,7 +5,7 @@
 #include <iostream>
 
 GLWidget::GLWidget(QWidget *parent)
-	: QGLWidget(parent), limited(false), _pause(false)
+	: QGLWidget(parent)
 {
 	setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
@@ -25,42 +25,39 @@ GLWidget::~GLWidget()
 
 void GLWidget::pause()
 {
-	_pause = !_pause;
-	if (!_pause && !sys.isRunning())
-		simulation_finished();
+	if (!sys.isRunning())
+		sys.stop();
+	else
+		sys.start();
 }
 
 void GLWidget::simulation_finished()
 {
-	double div = 5;
-	double dt = double(_t.restart()) / 1000.0;
+//	double div = 5;
+//	double dt = double(_t.restart()) / 1000.0;
 
-	updateGL();
+//	updateGL();
 
-	static QQueue<double> q;
-	static double sum = 0.0;
-	double N = 30;
-	sum += dt;
-	q.enqueue(dt);
-	while (q.size() > N)
-		sum -= q.dequeue();
+//	static QQueue<double> q;
+//	static double sum = 0.0;
+//	double N = 30;
+//	sum += dt;
+//	q.enqueue(dt);
+//	while (q.size() > N)
+//		sum -= q.dequeue();
 
-	std::cout << "total ("<<div<<"check) = " << 1000.0*sum/N << "ms" << std::endl;
-	std::cout << "opengl = " << _t.elapsed() << "ms" << std::endl;
+//	std::cout << "total ("<<div<<"check) = " << 1000.0*sum/N << "ms" << std::endl;
+//	std::cout << "opengl = " << _t.elapsed() << "ms" << std::endl;
 
-	double dtmin = 0.03*div;
-	limited = (dt > dtmin);
-	if (limited) {
-		std::cerr << "dt=" << dt << " is bigger than "<<dtmin<<"s (set to "<<dtmin<<"s)" << std::endl;
-		dt = dtmin;
-	}
+//	double dtmin = 0.03*div;
+//	limited = (dt > dtmin);
+//	if (limited) {
+//		std::cerr << "dt=" << dt << " is bigger than "<<dtmin<<"s (set to "<<dtmin<<"s)" << std::endl;
+//		dt = dtmin;
+//	}
 
-	if (!_pause) {
-		sys.dts.clear();
-		for (int i = 0; i < div; ++i)
-			sys.dts.append(dt/div);
-		sys.start();
-	}
+//	if (!_pause) {
+//	}
 }
 
 constexpr int vertex = 0;
@@ -104,8 +101,8 @@ void GLWidget::initializeGL()
 
 	_sphere.initializeGL(20, 20);
 
-	_t.start();
 	sys.start();
+	startTimer(1000/25);
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -175,6 +172,7 @@ void GLWidget::paintGL()
 	_sphere.bind();
 	_p.enableAttributeArray(vertex);
 	_p.setAttributeBuffer(vertex, GL_FLOAT, 0, 3);
+//	sys.pause(true);
 	for (const Particle& z : sys.ps) {
 		m.setToIdentity();
 		m.translate(z.q[0], z.q[1], z.q[2]);
@@ -186,10 +184,11 @@ void GLWidget::paintGL()
 
 		_sphere.drawElements();
 	}
+//	sys.pause(false);
 	_p.disableAttributeArray(vertex);
 	_sphere.release();
 
-	if (limited) {
+	if (sys.limited) {
 		QPainter p;
 		p.begin(this);
 		p.setPen(Qt::red);
@@ -223,4 +222,10 @@ void GLWidget::wheelEvent(QWheelEvent *e)
 	QMatrix4x4 m;
 	m.translate(0, 0, e->delta() * 0.05);
 	_v = m * _v;
+}
+
+void GLWidget::timerEvent(QTimerEvent *)
+{
+	if (sys.isRunning())
+		updateGL();
 }

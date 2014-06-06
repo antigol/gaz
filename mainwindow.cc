@@ -66,6 +66,7 @@ void MainWindow::slot_code_edited()
 
 void MainWindow::slot_compile()
 {
+	viewWidget->sys.pause(true);
 	viewWidget->sys.ps.clear();
 	int line = reader.run(&viewWidget->sys, editor->currentCode());
 	editor->setLineError(line, reader.error);
@@ -73,6 +74,7 @@ void MainWindow::slot_compile()
 		viewWidget->sys.ps.clear();
 		viewWidget->sys.initialize();
 	}
+	viewWidget->sys.pause(false);
 }
 
 void MainWindow::slot_algo_changed()

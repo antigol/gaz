@@ -4,7 +4,6 @@
 #include <QGLWidget>
 #include <QGLShaderProgram>
 #include <QMatrix4x4>
-#include <QTime>
 #include <QSound>
 #include "system.hh"
 #include "glsphere.hh"
@@ -32,18 +31,15 @@ private:
 	void mousePressEvent(QMouseEvent *e) override;
 	void mouseMoveEvent(QMouseEvent *e) override;
 	void wheelEvent(QWheelEvent *e) override;
+	void timerEvent(QTimerEvent *e) override;
 
 	QGLShaderProgram _p;
 	QMatrix4x4 _v;
-
-	QTime _t;
 
 
 	GLSphere _sphere;
 
 	QPointF _mouseLastPos;
-	bool limited;
-	bool _pause;
 };
 
 #endif // GLWIDGET_HH

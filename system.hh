@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 #include <QThread>
+#include <QMutex>
+#include <QTime>
 
 class System : public QThread
 {
@@ -19,7 +21,11 @@ public:
 	std::vector<Particle> ps;
 	double _dim[3];
 	int algorithm;
-	QList<double> dts;
+	double _dt;
+	bool limited;
+
+	void stop();
+	void pause(bool on);
 
 	void initialize();
 private:
@@ -29,6 +35,10 @@ private:
 
 	double _maxd;
 	std::vector<Particle*> ptr_ps;
+	bool _stop;
+	bool _pause;
+	QMutex _mutex;
+	QTime time;
 
 protected:
 	void run() override;
