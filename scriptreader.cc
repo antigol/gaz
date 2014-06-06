@@ -83,6 +83,11 @@ void ScriptReader::radius(double r)
 	_p.r = r;
 }
 
+void ScriptReader::gradius(double rg)
+{
+	_p.rg = rg;
+}
+
 void ScriptReader::color(double r, double g, double b)
 {
 	_p.color = Vec3(r, g, b);

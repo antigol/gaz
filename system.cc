@@ -11,6 +11,11 @@ System::System()
 {
 }
 
+System::~System()
+{
+	wait();
+}
+
 void System::setSizes(double x, double y, double z)
 {
 	_dim[0] = x;
@@ -21,8 +26,13 @@ void System::setSizes(double x, double y, double z)
 void System::evolve(double dt)
 {
 	// évolution
-	for (Particle& z : ps)
+	for (Particle& z : ps) {
 		z.q += z.p / z.m * dt;
+
+		// F = m*a <=> F = d(p)/dt <=> F*dt = d(p)
+		z.p += z.f * dt;
+		z.f.setNull();
+	}
 
 	// collision avec les murs
 	for (Particle& z : ps) {
@@ -58,7 +68,7 @@ void System::initialize()
 
 	_maxd = 0.0;
 	for (Particle& z : ps) {
-		_maxd = qMax(_maxd, z.r);
+		_maxd = qMax(_maxd, qMax(z.r, z.rg));
 		ptr_ps.push_back(&z);
 	}
 	_maxd *= 2.0001;
@@ -67,8 +77,7 @@ void System::initialize()
 void System::naive()
 {
 	for (std::size_t i = 0; i < ptr_ps.size(); ++i) {
-		for (std::size_t j = 0; j < ptr_ps.size(); ++j) {
-			if (i == j) continue;
+		for (std::size_t j = i+1; j < ptr_ps.size(); ++j) {
 			Particle::collision(ptr_ps[i], ptr_ps[j]);
 		}
 	}
@@ -79,13 +88,9 @@ void System::x_sort()
 	std::sort(ptr_ps.begin(), ptr_ps.end(), [] (Particle* a, Particle* b) {return a->q[0] < b->q[0];});
 
 	for (std::size_t i = 0; i < ptr_ps.size(); ++i) {
-		Particle *pi = ptr_ps[i];
-		for (int j = i-1; j >= 0
-			 && pi->q[0] - ptr_ps[j]->q[0] <= _maxd; --j)
-			Particle::collision(pi, ptr_ps[j]);
 		for (std::size_t j = i+1; j < ptr_ps.size()
-			 && ptr_ps[j]->q[0] - pi->q[0] <= _maxd; ++j)
-			Particle::collision(pi, ptr_ps[j]);
+			 && ptr_ps[j]->q[0] - ptr_ps[i]->q[0] <= _maxd; ++j)
+			Particle::collision(ptr_ps[i], ptr_ps[j]);
 	}
 }
 
@@ -100,7 +105,7 @@ void System::multimap()
 		u_int64_t z = std::max(std::round((ptr->q[2]+_dim[2]) / _maxd), 0.0);
 		map.emplace((z<<42) + (y<<21) + x, ptr);
 	}
-	for (auto ic = map.cbegin(); ic != map.cend(); ++ic) {
+	for (auto ic = map.cbegin(); ic != map.cend();) {
 		u_int64_t key = ic->first;
 		for (int z = 0; z <= 1; ++z) {
 			for (int y = (z==0 ? 0 : -1); y <= 1; ++y) {
@@ -113,5 +118,12 @@ void System::multimap()
 				}
 			}
 		}
+		ic = map.erase(ic);
 	}
+}
+
+void System::run()
+{
+	for (double dt : dts)
+		evolve(dt);
 }

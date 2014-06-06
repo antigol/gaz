@@ -57,6 +57,11 @@ Vec3 &Vec3::operator/=(double a)
 	return *this;
 }
 
+void Vec3::setNull()
+{
+	_d[0] = _d[1] = _d[2] = 0.0;
+}
+
 bool Vec3::isNull() const
 {
 	return _d[0] == 0.0 && _d[1] == 0.0 && _d[2] == 0.0;

@@ -15,6 +15,7 @@ public:
 	Vec3 &operator*=(double a);
 	Vec3 &operator/=(double a);
 
+	void setNull();
 	bool isNull() const;
 
 	static double dot(const Vec3& a, const Vec3& b);

@@ -22,6 +22,7 @@ public slots:
 	void momentum(double x, double y, double z);
 	void mass(double m);
 	void radius(double r);
+	void gradius(double rg);
 	void color(double r, double g, double b);
 	void addParticle();
 	void dimension(double wx, double wy, double wz);

@@ -22,11 +22,13 @@ public:
 public slots:
 	void pause();
 
+private slots:
+	void simulation_finished();
+
 private:
 	void initializeGL() override;
 	void resizeGL(int w, int h) override;
 	void paintGL() override;
-	void timerEvent(QTimerEvent *) override;
 	void mousePressEvent(QMouseEvent *e) override;
 	void mouseMoveEvent(QMouseEvent *e) override;
 	void wheelEvent(QWheelEvent *e) override;

@@ -13,6 +13,8 @@ GLWidget::GLWidget(QWidget *parent)
 
 	QSettings s;
 	_v = s.value("MATRIXVIEW", QMatrix4x4()).value<QMatrix4x4>();
+
+	connect(&sys, SIGNAL(finished()), this, SLOT(simulation_finished()));
 }
 
 GLWidget::~GLWidget()
@@ -24,6 +26,41 @@ GLWidget::~GLWidget()
 void GLWidget::pause()
 {
 	_pause = !_pause;
+	if (!_pause && !sys.isRunning())
+		simulation_finished();
+}
+
+void GLWidget::simulation_finished()
+{
+	double div = 5;
+	double dt = double(_t.restart()) / 1000.0;
+
+	updateGL();
+
+	static QQueue<double> q;
+	static double sum = 0.0;
+	double N = 30;
+	sum += dt;
+	q.enqueue(dt);
+	while (q.size() > N)
+		sum -= q.dequeue();
+
+	std::cout << "total ("<<div<<"check) = " << 1000.0*sum/N << "ms" << std::endl;
+	std::cout << "opengl = " << _t.elapsed() << "ms" << std::endl;
+
+	double dtmin = 0.03*div;
+	limited = (dt > dtmin);
+	if (limited) {
+		std::cerr << "dt=" << dt << " is bigger than "<<dtmin<<"s (set to "<<dtmin<<"s)" << std::endl;
+		dt = dtmin;
+	}
+
+	if (!_pause) {
+		sys.dts.clear();
+		for (int i = 0; i < div; ++i)
+			sys.dts.append(dt/div);
+		sys.start();
+	}
 }
 
 constexpr int vertex = 0;
@@ -67,8 +104,8 @@ void GLWidget::initializeGL()
 
 	_sphere.initializeGL(20, 20);
 
-	startTimer(0);
 	_t.start();
+	sys.start();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -160,38 +197,6 @@ void GLWidget::paintGL()
 		p.drawText(QPointF(10.0, 20.0), "Simulation slowed (not in real time)");
 		p.end();
 	}
-}
-
-void GLWidget::timerEvent(QTimerEvent *)
-{
-	double dt = double(_t.restart()) / 1000.0;
-	dt /= 2.0;
-
-	double dtmin = 0.03;
-	limited = (dt > dtmin);
-	if (limited) {
-		std::cerr << "dt is bigger than "<<dtmin<<"s (set to "<<dtmin<<"s)" << std::endl;
-		dt = dtmin;
-	}
-
-	if (!_pause) {
-		sys.evolve(dt);
-		sys.evolve(dt);
-	}
-	double ela = _t.elapsed();
-	ela /= 2.0;
-
-	updateGL();
-
-	static QQueue<double> q;
-	static double sum = 0.0;
-	double N = 30;
-	sum += ela;
-	q.enqueue(ela);
-	while (q.size() > N)
-		sum -= q.dequeue();
-	std::cout << "check collision = " << sum/N << "ms" << std::endl;
-	std::cout << "total = " << _t.elapsed() << "ms" << std::endl;
 }
 
 #include <QMouseEvent>
