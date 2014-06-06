@@ -156,14 +156,14 @@ void System::run()
 
 	while (!_stop) {
 		while (!_mutex.tryLock())
-			msleep(10);
+			msleep(1);
 		double dt = double(time.restart())/1000.0;
 		stats_sum += dt;
 		stats.enqueue(dt);
 		limited = dt > _dt && (dt = _dt);
 		evolve(dt);
 		_mutex.unlock();
-		msleep(1);
+		usleep(50);
 
 		while (stats.size() > stats_n)
 			stats_sum -= stats.dequeue();
