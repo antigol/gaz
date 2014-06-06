@@ -46,6 +46,8 @@ bool ScriptReader::runFile(System *s, const QString fileName)
 int ScriptReader::run(System *s, const QString code)
 {
 	_system = s;
+	_p = Particle();
+	dimension(20, 20, 20);
 
 	_eng.evaluate(code);
 
