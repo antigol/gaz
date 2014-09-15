@@ -22,7 +22,7 @@ GLWidget::~GLWidget()
 
 void GLWidget::pause()
 {
-	if (!sys.isRunning())
+    if (sys.isRunning())
 		sys.stop();
 	else
 		sys.start();
@@ -205,6 +205,5 @@ void GLWidget::keyReleaseEvent(QKeyEvent* e)
 
 void GLWidget::timerEvent(QTimerEvent *)
 {
-	if (sys.isRunning())
-		updateGL();
+    updateGL();
 }
