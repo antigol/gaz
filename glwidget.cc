@@ -189,7 +189,18 @@ void GLWidget::wheelEvent(QWheelEvent *e)
 {
 	QMatrix4x4 m;
 	m.translate(0, 0, e->delta() * 0.05);
-	_v = m * _v;
+  _v = m * _v;
+}
+
+#include <QKeyEvent>
+void GLWidget::keyPressEvent(QKeyEvent* e)
+{
+
+}
+
+void GLWidget::keyReleaseEvent(QKeyEvent* e)
+{
+
 }
 
 void GLWidget::timerEvent(QTimerEvent *)

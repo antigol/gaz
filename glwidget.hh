@@ -30,6 +30,8 @@ private:
 	void mousePressEvent(QMouseEvent *e) override;
 	void mouseMoveEvent(QMouseEvent *e) override;
 	void wheelEvent(QWheelEvent *e) override;
+  void keyPressEvent(QKeyEvent* e) override;
+  void keyReleaseEvent(QKeyEvent* e) override;
 	void timerEvent(QTimerEvent *e) override;
 
 	QGLShaderProgram _p;
