@@ -41,6 +41,17 @@ private:
 	GLSphere _sphere;
 
 	QPointF _mouseLastPos;
+
+  enum {
+    KeyUp     = 0x01,
+    KeyDown   = 0x02,
+    KeyLeft   = 0x04,
+    KeyRight  = 0x08,
+    KeyTLeft  = 0x10,
+    KeyTRight = 0x20
+  };
+
+  int _keyPressed;
 };
 
 #endif // GLWIDGET_HH

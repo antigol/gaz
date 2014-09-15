@@ -9,6 +9,7 @@ GLWidget::GLWidget(QWidget *parent)
 	setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
 	setAutoFillBackground(false);
+  setFocusPolicy(Qt::ClickFocus);
 
 	QSettings s;
 	_v = s.value("MATRIXVIEW", QMatrix4x4()).value<QMatrix4x4>();
@@ -195,15 +196,69 @@ void GLWidget::wheelEvent(QWheelEvent *e)
 #include <QKeyEvent>
 void GLWidget::keyPressEvent(QKeyEvent* e)
 {
-
+  switch (e->key()) {
+  case Qt::Key_W:
+  case Qt::Key_Up:
+    _keyPressed |= KeyUp;
+    break;
+  case Qt::Key_S:
+  case Qt::Key_Down:
+    _keyPressed |= KeyDown;
+    break;
+  case Qt::Key_A:
+  case Qt::Key_Left:
+    _keyPressed |= KeyLeft;
+    break;
+  case Qt::Key_D:
+  case Qt::Key_Right:
+    _keyPressed |= KeyRight;
+    break;
+  default:
+    break;
+  }
 }
 
 void GLWidget::keyReleaseEvent(QKeyEvent* e)
 {
-
+  switch (e->key()) {
+  case Qt::Key_W:
+  case Qt::Key_Up:
+    _keyPressed &= ~KeyUp;
+    break;
+  case Qt::Key_S:
+  case Qt::Key_Down:
+    _keyPressed &= ~KeyDown;
+    break;
+  case Qt::Key_A:
+  case Qt::Key_Left:
+    _keyPressed &= ~KeyLeft;
+    break;
+  case Qt::Key_D:
+  case Qt::Key_Right:
+    _keyPressed &= ~KeyRight;
+    break;
+  default:
+    break;
+  }
 }
 
 void GLWidget::timerEvent(QTimerEvent *)
 {
-    updateGL();
+  double step = 1.5;
+  QMatrix4x4 m;
+  if (_keyPressed & KeyUp) {
+    m.translate(0, 0, step);
+  }
+  if (_keyPressed & KeyDown) {
+    m.translate(0, 0, -step);
+  }
+  if (_keyPressed & KeyLeft) {
+    m.translate(step, 0, 0);
+  }
+  if (_keyPressed & KeyRight) {
+    m.translate(-step, 0, 0);
+  }
+  _v = m * _v;
+
+  updateGL();
 }
