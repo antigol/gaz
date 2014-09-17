@@ -28,6 +28,8 @@ public slots:
 	void dimension(double wx, double wy, double wz);
 	double rand(double a, double b) const;
 	double randn(double mu, double sigma) const;
+    void g(double gx, double gy, double gz);
+    void cor(double _cor);
 
 private:
 	QScriptEngine _eng;

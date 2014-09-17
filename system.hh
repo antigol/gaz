@@ -17,11 +17,14 @@ public:
 	void setSizes(double x, double y, double z);
 
 	void evolve(double dt);
+    QVector<double> pairCorelation(int nBins);
 
 	std::vector<Particle> ps;
 	double _dim[3];
 	int algorithm;
 	double _dt;
+    Vec3 _g;
+    double _cor;
 	bool limited;
 
 	void stop();

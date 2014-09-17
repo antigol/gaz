@@ -20,6 +20,7 @@ public:
 
 	static double dot(const Vec3& a, const Vec3& b);
 	static double norm(const Vec3& a);
+    static double length(const Vec3& a);
 	static Vec3 random(double L = 1.0);
 private:
 	double _d[3];

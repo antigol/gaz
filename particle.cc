@@ -10,7 +10,7 @@ Particle::Particle()
 	f.setNull();
 }
 
-void Particle::collision(Particle *a, Particle *b)
+void Particle::collision(Particle *a, Particle *b, double cor)
 {
 	if (a == b)
 		return;
@@ -23,13 +23,13 @@ void Particle::collision(Particle *a, Particle *b)
 		Vec3 vg = (a->p + b->p) / (a->m + b->m);
 		// p : q. de mvt de la particule a, la particule b à une q. de mvt de -p
 		Vec3 p = a->p - a->m * vg;
-		Vec3 p_prim = p - 2.0 * Vec3::dot(p, n) / n_norm * n;
+        Vec3 p_prim = p - (1.0+cor) * Vec3::dot(p, n) / n_norm * n;
 		// on retourne dans les coordonnées globales
 		a->p = a->m * vg + p_prim;
 		b->p = b->m * vg - p_prim;
 	}
 
-	// interation gravitationelle
+    // interaction gravitationelle
 	else if (n_norm < (a->rg + b->rg)*(a->rg + b->rg)) {
 		// F = ma*mb / r^2
 		Vec3 F = a->m * b->m * n * pow(n_norm, -3.0/2.0);

@@ -15,13 +15,14 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
+
 private slots:
 	void slot_code_edited();
 	void slot_compile();
 	void slot_algo_changed();
 
 private:
-	GLWidget* viewWidget;
+    GLWidget* viewWidget;
 
 	ScriptReader reader;
 	ScriptEditor* editor;

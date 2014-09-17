@@ -30,7 +30,8 @@ SOURCES += main.cc\
     glsphere.cc \
     mainwindow.cc \
     scriptreader.cc \
-    scripteditor.cc
+    scripteditor.cc \
+    paircorfunwidget.cc
 
 HEADERS  += glwidget.hh \
     system.hh \
@@ -40,7 +41,8 @@ HEADERS  += glwidget.hh \
     glsphere.hh \
     mainwindow.hh \
     scriptreader.hh \
-    scripteditor.hh
+    scripteditor.hh \
+    paircorfunwidget.hh
 
 FORMS += \
     scripteditor.ui

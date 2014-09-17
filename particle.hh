@@ -15,7 +15,7 @@ struct Particle
 	Vec3 color;
 	Vec3 f; // force
 
-	static void collision(Particle *a, Particle *b);
+    static void collision(Particle *a, Particle *b, double cor);
 };
 
 #endif // PARTICLE_HH

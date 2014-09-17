@@ -74,7 +74,12 @@ double Vec3::dot(const Vec3 &a, const Vec3 &b)
 
 double Vec3::norm(const Vec3 &a)
 {
-	return a[0]*a[0] + a[1]*a[1] + a[2]*a[2];
+  return a[0]*a[0] + a[1]*a[1] + a[2]*a[2];
+}
+
+double Vec3::length(const Vec3& a)
+{
+  return std::sqrt(norm(a));
 }
 
 Vec3 Vec3::random(double L)

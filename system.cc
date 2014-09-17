@@ -7,12 +7,15 @@
 #include <map>
 #include <unordered_map>
 #include <iostream>
+#include <algorithm>
 
 System::System()
 	: algorithm(0)
 	, limited(false)
 {
 	_dt = 10e-3;
+    _g = Vec3(0,0,0);
+    _cor = 1;
 }
 
 System::~System()
@@ -32,22 +35,22 @@ void System::evolve(double dt)
 {
 	// évolution
 	for (Particle& z : ps) {
-		z.q += z.p / z.m * dt;
+        z.q += z.p / z.m * dt;
 
 		// F = m*a <=> F = d(p)/dt <=> F*dt = d(p)
-		z.p += z.f * dt;
+        z.p += (z.f + _g * z.m) * dt;
 		z.f.setNull();
 	}
 
-	// collision avec les murs
+    // collision avec les murs (rajouter la pensanteur)
 	for (Particle& z : ps) {
 		for (int k = 0; k < 3; ++k) {
 			if (z.q[k] < -_dim[k] + z.r && z.p[k] < 0.0) {
-				z.p[k] = -z.p[k];
+                z.p[k] = -_cor*z.p[k];
 				break;
 			}
 			if (z.q[k] > _dim[k] - z.r && z.p[k] > 0.0) {
-				z.p[k] = -z.p[k];
+                z.p[k] = -_cor*z.p[k];
 				break;
 			}
 		}
@@ -64,7 +67,31 @@ void System::evolve(double dt)
 	case 2:
 		naive();
 		break;
-	}
+    }
+}
+
+QVector<double> System::pairCorelation(int nBins)
+{
+  QVector<double> distances;
+  for (size_t i = 0; i < ps.size(); ++i) {
+    for (size_t j = i+1; j < ps.size(); ++j) {
+      distances.push_back(Vec3::length(ps[i].q - ps[j].q));
+    }
+  }
+  qSort(distances);
+
+  if (distances.isEmpty()) return QVector<double>();
+
+  double step = distances.last() / nBins;
+  QVector<double> result(nBins);
+  for (int i = 0; i < nBins; ++i) {
+    // ]a,b]
+    result[i] = std::distance(std::upper_bound(distances.begin(), distances.end(), i * step),
+                             std::upper_bound(distances.begin(), distances.end(), i * step + step));
+    result[i] /= std::pow(i * step + step, 3.0) - std::pow(i * step, 3.0);
+  }
+
+  return result;
 }
 
 void System::stop()
@@ -98,7 +125,7 @@ void System::naive()
 {
 	for (std::size_t i = 0; i < ptr_ps.size(); ++i) {
 		for (std::size_t j = i+1; j < ptr_ps.size(); ++j) {
-			Particle::collision(ptr_ps[i], ptr_ps[j]);
+            Particle::collision(ptr_ps[i], ptr_ps[j], _cor);
 		}
 	}
 }
@@ -110,7 +137,7 @@ void System::x_sort()
 	for (std::size_t i = 0; i < ptr_ps.size(); ++i) {
 		for (std::size_t j = i+1; j < ptr_ps.size()
 			 && ptr_ps[j]->q[0] - ptr_ps[i]->q[0] <= _maxd; ++j)
-			Particle::collision(ptr_ps[i], ptr_ps[j]);
+            Particle::collision(ptr_ps[i], ptr_ps[j], _cor);
 	}
 }
 
@@ -133,7 +160,7 @@ void System::multimap()
 				u_int64_t keyEnd   = key + z*(1ul<<42) + y*(1ul<<21) + 1;
 				auto i = map.lower_bound(keyBegin);
 				while (i != map.cend() && i->first <= keyEnd) {
-					Particle::collision(ic->second, i->second);
+                    Particle::collision(ic->second, i->second, _cor);
 					++i;
 				}
 			}

@@ -7,40 +7,41 @@
 #include <QSound>
 #include "system.hh"
 #include "glsphere.hh"
+#include "paircorfunwidget.hh"
 
 class GLWidget : public QGLWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	GLWidget(QWidget *parent = 0);
-	~GLWidget();
+  GLWidget(QWidget *parent = 0);
+  ~GLWidget();
 
-	System sys;
+  System sys;
 
 public slots:
-	void pause();
+  void pause();
 
 private slots:
 
 private:
-	void initializeGL() override;
-	void resizeGL(int w, int h) override;
-	void paintGL() override;
-	void mousePressEvent(QMouseEvent *e) override;
-	void mouseMoveEvent(QMouseEvent *e) override;
-	void wheelEvent(QWheelEvent *e) override;
+  void initializeGL() override;
+  void resizeGL(int w, int h) override;
+  void paintGL() override;
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseMoveEvent(QMouseEvent *e) override;
+  void wheelEvent(QWheelEvent *e) override;
   void keyPressEvent(QKeyEvent* e) override;
   void keyReleaseEvent(QKeyEvent* e) override;
-	void timerEvent(QTimerEvent *e) override;
+  void timerEvent(QTimerEvent *e) override;
 
-	QGLShaderProgram _p;
-	QMatrix4x4 _v;
+  QGLShaderProgram _p;
+  QMatrix4x4 _v;
 
 
-	GLSphere _sphere;
+  GLSphere _sphere;
 
-	QPointF _mouseLastPos;
+  QPointF _mouseLastPos;
 
   enum {
     KeyUp     = 0x01,
@@ -52,6 +53,8 @@ private:
   };
 
   int _keyPressed;
+
+  PairCorFunWidget pcf;
 };
 
 #endif // GLWIDGET_HH
