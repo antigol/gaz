@@ -44,12 +44,16 @@ private:
   QPointF _mouseLastPos;
 
   enum {
-    KeyUp     = 0x01,
-    KeyDown   = 0x02,
-    KeyLeft   = 0x04,
-    KeyRight  = 0x08,
-    KeyTLeft  = 0x10,
-    KeyTRight = 0x20
+    KeyToward     = 0x01,
+    KeyBackward   = 0x02,
+    KeyLeft       = 0x04,
+    KeyRight      = 0x08,
+    KeyTLeft      = 0x10,
+    KeyTRight     = 0x20,
+    KeyUp         = 0x40,
+    KeyDown       = 0x80,
+    KeyTurnLeft   = 0x100,
+    KeyTurnRight  = 0x200
   };
 
   int _keyPressed;

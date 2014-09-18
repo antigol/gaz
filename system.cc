@@ -47,11 +47,9 @@ void System::evolve(double dt)
 		for (int k = 0; k < 3; ++k) {
 			if (z.q[k] < -_dim[k] + z.r && z.p[k] < 0.0) {
                 z.p[k] = -_cor*z.p[k];
-				break;
 			}
 			if (z.q[k] > _dim[k] - z.r && z.p[k] > 0.0) {
                 z.p[k] = -_cor*z.p[k];
-				break;
 			}
 		}
 	}
@@ -59,7 +57,7 @@ void System::evolve(double dt)
 	// collision avec les particules
 	switch (algorithm) {
 	case 0:
-		multimap();
+        multimap(std::bind(Particle::collision, std::placeholders::_1, std::placeholders::_2, _cor), 1.001);
 		break;
 	case 1:
 		x_sort();
@@ -118,7 +116,7 @@ void System::initialize()
 		_maxd = qMax(_maxd, qMax(z.r, z.rg));
 		ptr_ps.push_back(&z);
 	}
-	_maxd *= 2.0001;
+    _maxd *= 2.0;
 }
 
 void System::naive()
@@ -141,15 +139,16 @@ void System::x_sort()
 	}
 }
 
-void System::multimap()
+void System::multimap(std::function<void(Particle*,Particle*)> f, double nDiameter)
 {
 	std::multimap<u_int64_t, Particle*> map;
 
+    double divisor = nDiameter * _maxd;
 	for (std::size_t i = 0; i < ptr_ps.size(); ++i) {
 		Particle *ptr = ptr_ps[i];
-		u_int64_t x = std::max(std::round((ptr->q[0]+_dim[0]) / _maxd), 0.0);
-		u_int64_t y = std::max(std::round((ptr->q[1]+_dim[1]) / _maxd), 0.0);
-		u_int64_t z = std::max(std::round((ptr->q[2]+_dim[2]) / _maxd), 0.0);
+        u_int64_t x = std::max(std::round((ptr->q[0]+_dim[0]) / divisor), 0.0);
+        u_int64_t y = std::max(std::round((ptr->q[1]+_dim[1]) / divisor), 0.0);
+        u_int64_t z = std::max(std::round((ptr->q[2]+_dim[2]) / divisor), 0.0);
 		map.emplace((z<<42) + (y<<21) + x, ptr);
 	}
 	for (auto ic = map.cbegin(); ic != map.cend();) {
@@ -160,7 +159,7 @@ void System::multimap()
 				u_int64_t keyEnd   = key + z*(1ul<<42) + y*(1ul<<21) + 1;
 				auto i = map.lower_bound(keyBegin);
 				while (i != map.cend() && i->first <= keyEnd) {
-                    Particle::collision(ic->second, i->second, _cor);
+                    f(ic->second, i->second);
 					++i;
 				}
 			}

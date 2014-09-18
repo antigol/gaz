@@ -202,11 +202,11 @@ void GLWidget::keyPressEvent(QKeyEvent* e)
   switch (e->key()) {
   case Qt::Key_W:
   case Qt::Key_Up:
-    _keyPressed |= KeyUp;
+    _keyPressed |= KeyToward;
     break;
   case Qt::Key_S:
   case Qt::Key_Down:
-    _keyPressed |= KeyDown;
+    _keyPressed |= KeyBackward;
     break;
   case Qt::Key_A:
   case Qt::Key_Left:
@@ -215,6 +215,18 @@ void GLWidget::keyPressEvent(QKeyEvent* e)
   case Qt::Key_D:
   case Qt::Key_Right:
     _keyPressed |= KeyRight;
+    break;
+  case Qt::Key_R:
+    _keyPressed |= KeyUp;
+    break;
+  case Qt::Key_F:
+    _keyPressed |= KeyDown;
+    break;
+  case Qt::Key_Q:
+    _keyPressed |= KeyTurnLeft;
+    break;
+  case Qt::Key_E:
+    _keyPressed |= KeyTurnRight;
     break;
   default:
     break;
@@ -226,11 +238,11 @@ void GLWidget::keyReleaseEvent(QKeyEvent* e)
   switch (e->key()) {
   case Qt::Key_W:
   case Qt::Key_Up:
-    _keyPressed &= ~KeyUp;
+    _keyPressed &= ~KeyToward;
     break;
   case Qt::Key_S:
   case Qt::Key_Down:
-    _keyPressed &= ~KeyDown;
+    _keyPressed &= ~KeyBackward;
     break;
   case Qt::Key_A:
   case Qt::Key_Left:
@@ -239,6 +251,18 @@ void GLWidget::keyReleaseEvent(QKeyEvent* e)
   case Qt::Key_D:
   case Qt::Key_Right:
     _keyPressed &= ~KeyRight;
+    break;
+  case Qt::Key_R:
+    _keyPressed &= ~KeyUp;
+    break;
+  case Qt::Key_F:
+    _keyPressed &= ~KeyDown;
+    break;
+  case Qt::Key_Q:
+    _keyPressed &= ~KeyTurnLeft;
+    break;
+  case Qt::Key_E:
+    _keyPressed &= ~KeyTurnRight;
     break;
   default:
     break;
@@ -249,10 +273,10 @@ void GLWidget::timerEvent(QTimerEvent *)
 {
   double step = 1.5;
   QMatrix4x4 m;
-  if (_keyPressed & KeyUp) {
+  if (_keyPressed & KeyToward) {
     m.translate(0, 0, step);
   }
-  if (_keyPressed & KeyDown) {
+  if (_keyPressed & KeyBackward) {
     m.translate(0, 0, -step);
   }
   if (_keyPressed & KeyLeft) {
@@ -260,6 +284,18 @@ void GLWidget::timerEvent(QTimerEvent *)
   }
   if (_keyPressed & KeyRight) {
     m.translate(-step, 0, 0);
+  }
+  if (_keyPressed & KeyUp) {
+    m.translate(0, -step, 0);
+  }
+  if (_keyPressed & KeyDown) {
+    m.translate(0, step, 0);
+  }
+  if (_keyPressed & KeyTurnLeft) {
+    m.rotate(2.0, 0,0,-1);
+  }
+  if (_keyPressed & KeyTurnRight) {
+    m.rotate(2.0, 0,0,1);
   }
   _v = m * _v;
 

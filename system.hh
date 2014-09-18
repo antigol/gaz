@@ -4,6 +4,8 @@
 #include "particle.hh"
 #include <vector>
 #include <map>
+#include <functional>
+
 #include <QThread>
 #include <QMutex>
 #include <QTime>
@@ -34,7 +36,7 @@ public:
 private:
 	void naive();
 	void x_sort();
-	void multimap();
+    void multimap(std::function<void(Particle*, Particle*)> f, double nDiameter);
 
 	double _maxd;
 	std::vector<Particle*> ptr_ps;
