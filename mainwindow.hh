@@ -7,6 +7,7 @@
 #include "glwidget.hh"
 #include "scriptreader.hh"
 #include "scripteditor.hh"
+#include "paircorfunwidget.hh"
 
 class MainWindow : public QMainWindow
 {
@@ -23,6 +24,8 @@ private slots:
 
 private:
     GLWidget* viewWidget;
+    PairCorFunWidget* pcf;
+
 
 	ScriptReader reader;
 	ScriptEditor* editor;

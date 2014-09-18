@@ -66,16 +66,18 @@ void System::evolve(double dt)
 		naive();
 		break;
     }
+
+    emit steped();
 }
 
-QVector<double> System::pairCorelation(int nBins)
+QVector<double> System::pairCorelation(int nBins, double nDiameter)
 {
   QVector<double> distances;
-  for (size_t i = 0; i < ps.size(); ++i) {
-    for (size_t j = i+1; j < ps.size(); ++j) {
-      distances.push_back(Vec3::length(ps[i].q - ps[j].q));
-    }
-  }
+  auto f = [&](Particle* p1, Particle* p2) {
+    distances.push_back(Vec3::length(p1->q - p2->q));
+  };
+
+  multimap(f, nDiameter);
   qSort(distances);
 
   if (distances.isEmpty()) return QVector<double>();

@@ -7,7 +7,6 @@
 #include <QSound>
 #include "system.hh"
 #include "glsphere.hh"
-#include "paircorfunwidget.hh"
 
 class GLWidget : public QGLWidget
 {
@@ -57,8 +56,6 @@ private:
   };
 
   int _keyPressed;
-
-  PairCorFunWidget pcf;
 };
 
 #endif // GLWIDGET_HH

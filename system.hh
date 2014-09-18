@@ -12,6 +12,8 @@
 
 class System : public QThread
 {
+  Q_OBJECT
+
 public:
 	System();
 	~System();
@@ -19,7 +21,7 @@ public:
 	void setSizes(double x, double y, double z);
 
 	void evolve(double dt);
-    QVector<double> pairCorelation(int nBins);
+    QVector<double> pairCorelation(int nBins, double nDiameter);
 
 	std::vector<Particle> ps;
 	double _dim[3];
@@ -33,6 +35,9 @@ public:
 	void pause(bool on);
 
 	void initialize();
+signals:
+    void steped();
+
 private:
 	void naive();
 	void x_sort();

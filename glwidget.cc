@@ -13,9 +13,6 @@ GLWidget::GLWidget(QWidget *parent)
 
   QSettings s;
   _v = s.value("MATRIXVIEW", QMatrix4x4()).value<QMatrix4x4>();
-
-  pcf.sys = &sys;
-  pcf.show();
 }
 
 GLWidget::~GLWidget()

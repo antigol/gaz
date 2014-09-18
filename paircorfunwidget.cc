@@ -11,12 +11,10 @@ PairCorFunWidget::PairCorFunWidget(QWidget *parent) :
 void PairCorFunWidget::paintEvent(QPaintEvent* )
 {
   int nBins = width();
-  QVector<double> pcf = sys->pairCorelation(nBins);
+  QVector<double> pcf = sys->pairCorelation(nBins, 2.5);
 
 
   double max = *std::max_element(pcf.begin(), pcf.end());
-//  static double maxg = max;
-//  maxg = std::max(maxg, max);
   for (double& x : pcf) x /= max;
 
 
@@ -25,9 +23,6 @@ void PairCorFunWidget::paintEvent(QPaintEvent* )
 
   p.scale(1, -1);
   p.translate(0, -height());
-
-  p.setPen(QPen(Qt::yellow,  1.0));
-  p.setBrush(Qt::yellow);
 
   for (int i = 0; i < pcf.size(); ++i) {
     p.drawLine(i, 0, i, height() * pcf[i]);
