@@ -35,6 +35,11 @@ public:
 	void pause(bool on);
 
 	void initialize();
+
+public slots:
+    void reverse();
+
+
 signals:
     void steped();
 

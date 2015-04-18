@@ -45,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
   action_pause->setCheckable(true);
   action_pause->setChecked(false);
 
+  menuBar()->addAction("reverse", &(viewWidget->sys),SLOT(reverse()));
+
   QMenu* menu = menuBar()->addMenu("algorithm");
 
   comboBox = new QComboBox(menu);
