@@ -49,14 +49,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
   QMenu* menu = menuBar()->addMenu("algorithm");
 
-  comboBox = new QComboBox(menu);
+  comboBox_algo = new QComboBox(menu);
   QWidgetAction *action = new QWidgetAction(menu);
-  action->setDefaultWidget(comboBox);
+  action->setDefaultWidget(comboBox_algo);
   menu->addAction(action);
 
-  comboBox->addItems(QStringList() << "multimap" << "x sort" << "naive");
+  comboBox_algo->addItems(QStringList() << "multimap" << "x sort" << "naive");
 
-  connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_algo_changed()));
+  connect(comboBox_algo, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_algo_changed()));
+
+  comboBox_inter = new QComboBox(menu);
+  action = new QWidgetAction(menu);
+  action->setDefaultWidget(comboBox_inter);
+  menu->addAction(action);
+
+  comboBox_inter->addItems(QStringList() << "simple" << "backtrack");
+
+  connect(comboBox_inter, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_inter_changed()));
 }
 
 MainWindow::~MainWindow()
@@ -89,5 +98,10 @@ void MainWindow::slot_compile()
 
 void MainWindow::slot_algo_changed()
 {
-  viewWidget->sys.algorithm = comboBox->currentIndex();
+  viewWidget->sys.algorithm = comboBox_algo->currentIndex();
+}
+
+void MainWindow::slot_inter_changed()
+{
+  viewWidget->sys.interactor = comboBox_inter->currentIndex();
 }

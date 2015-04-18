@@ -11,6 +11,7 @@
 
 System::System()
   : algorithm(0)
+  , interactor(0)
   , limited(false)
 {
   _dt = 10e-3;
@@ -42,28 +43,37 @@ void System::evolve(double dt)
     z.f.setNull();
   }
 
+  std::function<void(Particle*,int,double)> int_wall;
+  std::function<void(Particle*,Particle*)> int_part;
+  switch (interactor) {
+  case 0:
+    int_wall = Particle::backtrack_interaction_wall;
+    int_part = std::bind(Particle::simple_interaction, std::placeholders::_1, std::placeholders::_2, _cor);
+    break;
+  case 1:
+    int_wall = Particle::backtrack_interaction_wall;
+    int_part = std::bind(Particle::backtrack_interaction, std::placeholders::_1, std::placeholders::_2, _cor);
+    break;
+  }
+
   // collision avec les murs (rajouter la pensanteur)
-  for (Particle& z : ps) {
+  for (Particle* z : ptr_ps) {
     for (int k = 0; k < 3; ++k) {
-      if (z.q[k] < -_dim[k] + z.r && z.p[k] < 0.0) {
-        z.p[k] = -_cor*z.p[k];
-      }
-      if (z.q[k] > _dim[k] - z.r && z.p[k] > 0.0) {
-        z.p[k] = -_cor*z.p[k];
-      }
+      int_wall(z, k, _dim[k]);
+      int_wall(z, k, -_dim[k]);
     }
   }
 
   // collision avec les particules
   switch (algorithm) {
   case 0:
-    multimap(std::bind(Particle::collision, std::placeholders::_1, std::placeholders::_2, _cor), 1.001);
+    multimap(int_part, 1.001);
     break;
   case 1:
-    x_sort();
+    x_sort(int_part);
     break;
   case 2:
-    naive();
+    naive(int_part);
     break;
   }
 
@@ -128,23 +138,23 @@ void System::reverse()
   }
 }
 
-void System::naive()
+void System::naive(std::function<void(Particle*,Particle*)> f)
 {
   for (std::size_t i = 0; i < ptr_ps.size(); ++i) {
     for (std::size_t j = i+1; j < ptr_ps.size(); ++j) {
-      Particle::collision(ptr_ps[i], ptr_ps[j], _cor);
+      f(ptr_ps[i], ptr_ps[j]);
     }
   }
 }
 
-void System::x_sort()
+void System::x_sort(std::function<void(Particle*,Particle*)> f)
 {
   std::sort(ptr_ps.begin(), ptr_ps.end(), [] (Particle* a, Particle* b) {return a->q[0] < b->q[0];});
 
   for (std::size_t i = 0; i < ptr_ps.size(); ++i) {
     for (std::size_t j = i+1; j < ptr_ps.size()
          && ptr_ps[j]->q[0] - ptr_ps[i]->q[0] <= _maxd; ++j)
-      Particle::collision(ptr_ps[i], ptr_ps[j], _cor);
+      f(ptr_ps[i], ptr_ps[j]);
   }
 }
 

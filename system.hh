@@ -26,6 +26,7 @@ public:
 	std::vector<Particle> ps;
 	double _dim[3];
 	int algorithm;
+    int interactor;
 	double _dt;
     Vec3 _g;
     double _cor;
@@ -44,8 +45,8 @@ signals:
     void steped();
 
 private:
-	void naive();
-	void x_sort();
+    void naive(std::function<void(Particle*, Particle*)> f);
+    void x_sort(std::function<void(Particle*,Particle*)> f);
     void multimap(std::function<void(Particle*, Particle*)> f, double nDiameter);
 
 	double _maxd;
