@@ -133,7 +133,7 @@ void Highlighter::highlightBlock(const QString &text)
 		QTextCharFormat green;
 		green.setForeground(Qt::darkGreen);
 
-        QRegExp expression("\\bApp.(print|position|momentum|mass|radius|gradius|color|addParticle|dimension|rand|randn|g|cor)\\b");
+				QRegExp expression("\\bApp.(print|position|momentum|mass|radius|gradius|color|colorHSV|addParticle|dimension|rand|randn|g|cor)\\b");
 		int index = text.indexOf(expression);
 		while (index >= 0) {
 			int length = expression.matchedLength();

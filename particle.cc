@@ -49,10 +49,14 @@ void Particle::backtrack_interaction(Particle* a, Particle* b, double cor)
   double r2 = r*r;
   Vec3 q = a->q - b->q;
   double q2 = Vec3::norm(q); // longueur au carré
+
+  Vec3 v = a->p/a->m + a->p/b->m;
+  double qv = Vec3::dot(q, v);
+
   // détecte si les particules sont proches et aussi si elle se font face
-  if (q2 < r2 && Vec3::dot(q, a->p * b->m - b->p * a->m) < 0.0) {
+  if (q2 < r2 && qv < 0.0) {
     // différance de vitesse
-    Vec3 v = a->p/a->m + a->p/b->m;
+    double v2 = Vec3::norm(v);
 
     // on ce place dans le référentiel de centre de masse
     Vec3 vg = (a->p + b->p) / (a->m + b->m);
@@ -64,12 +68,12 @@ void Particle::backtrack_interaction(Particle* a, Particle* b, double cor)
     Vec3 apf = a->m * vg + p_prim;
     Vec3 bpf = b->m * vg - p_prim;
 
-    double nv = Vec3::dot(q, v);
-    double v2 = Vec3::norm(v);
-    double t = (-nv - std::sqrt(nv*nv + v2*(r2-q2))) / v2;
+    double t = (qv + std::sqrt(qv*qv + v2*(r2-q2))) / v2; // positive time in the past
 
-    a->q += t * (a->p - apf) / a->m;
-    b->q += t * (b->p - bpf) / b->m;
+//    a->q += t * (a->p - apf) / a->m;
+//    b->q += t * (b->p - bpf) / b->m;
+    a->q = a->q - t * a->p/a->m;
+    b->q = b->q - t * b->p/b->m;
 
     a->p = apf;
     b->p = bpf;
@@ -84,19 +88,32 @@ void Particle::backtrack_interaction(Particle* a, Particle* b, double cor)
   }
 }
 
-void Particle::backtrack_interaction_wall(Particle* a, int k, double w)
+void Particle::simple_interaction_wall(Particle* a, int k, double w, double cor)
 {
   if (w > 0.0) {
     if (a->q[k] > w - a->r && a->p[k] > 0.0) {
-      double t = (w - a->r - a->q[k]) / a->p[k] * a->m;
-      a->q[k] += 2.0 * t * a->p[k] / a->m;
-      a->p[k] = -a->p[k];
+      a->p[k] = -cor*a->p[k];
     }
   } else {
     if (a->q[k] < w + a->r && a->p[k] < 0.0) {
-      double t = (w + a->r - a->q[k]) / a->p[k] * a->m;
-      a->q[k] += 2.0 * t * a->p[k] / a->m;
-      a->p[k] = -a->p[k];
+      a->p[k] = -cor*a->p[k];
+    }
+  }
+}
+
+void Particle::backtrack_interaction_wall(Particle* a, int k, double w, double cor)
+{
+  if (w > 0.0) {
+    w -= a->r;
+    if (a->q[k] > w && a->p[k] > 0.0) {
+      //a->q[k] = w - cor * (a->q[k] - w);
+      a->p[k] = -cor*a->p[k];
+    }
+  } else {
+    w += a->r;
+    if (a->q[k] < w && a->p[k] < 0.0) {
+//      a->q[k] = w + cor * (w - a->q[k]);
+      a->p[k] = -cor*a->p[k];
     }
   }
 }

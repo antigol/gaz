@@ -4,7 +4,7 @@
 #include <QGLWidget>
 #include <QGLShaderProgram>
 #include <QMatrix4x4>
-#include <QSound>
+//#include <QSound>
 #include "system.hh"
 #include "glsphere.hh"
 

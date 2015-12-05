@@ -24,12 +24,13 @@ public slots:
 	void radius(double r);
 	void gradius(double rg);
 	void color(double r, double g, double b);
+	void colorHSV(double h, double v, double s);
 	void addParticle();
 	void dimension(double wx, double wy, double wz);
 	double rand(double a, double b) const;
 	double randn(double mu, double sigma) const;
-    void g(double gx, double gy, double gz);
-    void cor(double _cor);
+	void g(double gx, double gy, double gz);
+	void cor(double _cor);
 
 private:
 	QScriptEngine _eng;

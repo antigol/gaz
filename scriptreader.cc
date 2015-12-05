@@ -103,7 +103,24 @@ void ScriptReader::gradius(double rg)
 
 void ScriptReader::color(double r, double g, double b)
 {
-  _p.color = Vec3(r, g, b);
+	_p.color = Vec3(r, g, b);
+}
+
+// When 0 ≤ H < 360, 0 ≤ S ≤ 1 and 0 ≤ V ≤ 1
+void ScriptReader::colorHSV(double H, double V, double S)
+{
+	double C = V * S;
+	double X = C * (1.0 - std::abs(std::fmod(H / 60.0, 2.0) - 1.0));
+	double M = V - C;
+	Vec3 RGB;
+	if (H < 60.0) RGB = Vec3(C, X, 0);
+	else if (H < 120) RGB = Vec3(X, C, 0);
+	else if (H < 180) RGB = Vec3(0, C, X);
+	else if (H < 240) RGB = Vec3(0, X, C);
+	else if (H < 300) RGB = Vec3(X, 0, C);
+	else RGB = Vec3(C, 0, X);
+
+	_p.color = Vec3(M,M,M) + RGB;
 }
 
 void ScriptReader::addParticle()

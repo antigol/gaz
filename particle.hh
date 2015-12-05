@@ -18,7 +18,8 @@ struct Particle
   static void simple_interaction(Particle *a, Particle *b, double cor);
   static void backtrack_interaction(Particle* a, Particle* b, double cor);
 
-  static void backtrack_interaction_wall(Particle* a, int dim, double pos);
+  static void simple_interaction_wall(Particle* a, int k, double w, double cor);
+  static void backtrack_interaction_wall(Particle* a, int k, double w, double cor);
 };
 
 #endif // PARTICLE_HH

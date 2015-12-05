@@ -45,14 +45,15 @@ void System::evolve(double dt)
 
   std::function<void(Particle*,int,double)> int_wall;
   std::function<void(Particle*,Particle*)> int_part;
+  using namespace std::placeholders;
   switch (interactor) {
   case 0:
-    int_wall = Particle::backtrack_interaction_wall;
-    int_part = std::bind(Particle::simple_interaction, std::placeholders::_1, std::placeholders::_2, _cor);
+    int_wall = std::bind(Particle::simple_interaction_wall, _1, _2, _3, _cor);
+    int_part = std::bind(Particle::simple_interaction, _1, _2, _cor);
     break;
   case 1:
-    int_wall = Particle::backtrack_interaction_wall;
-    int_part = std::bind(Particle::backtrack_interaction, std::placeholders::_1, std::placeholders::_2, _cor);
+    int_wall = std::bind(Particle::backtrack_interaction_wall, _1, _2, _3, _cor);
+    int_part = std::bind(Particle::backtrack_interaction, _1, _2, _cor);
     break;
   }
 
